@@ -44,7 +44,8 @@ project "Waffle2D"
 	}
 	includedirs
 	{
-		"Depen/glad/include"
+		"Depen/glad/include",
+		"Depen/stb"
 	}
 	filter "configurations:Debug"
 		symbols "On"

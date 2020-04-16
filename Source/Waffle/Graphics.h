@@ -4,6 +4,7 @@ namespace Waffle
 {
 	class Window;
 	class Sprite;
+	class Image;
 	class Graphics
 	{
 	private:
@@ -36,5 +37,7 @@ namespace Waffle
 		bool m_viewportDirty;
 		int m_width;
 		int m_height;
+
+		Image* m_whiteImage;
 	};
 }

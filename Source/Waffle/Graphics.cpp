@@ -3,6 +3,7 @@
 #include "FileUtils.h"
 #include "MathUtils.h"
 #include "Sprite.h"
+#include "Image.h"
 
 #include <cstdio>
 
@@ -52,6 +53,7 @@ Graphics::Graphics()
 	, m_renderContext(nullptr)
 	, m_spritePipeline(0)
 	, m_viewportDirty(false)
+	, m_whiteImage(nullptr)
 {
 }
 
@@ -124,7 +126,7 @@ bool Graphics::Init()
 
 	m_width = m_window->GetWidth();
 	m_height = m_window->GetHeight();
-	printf(" Render size: %ix%i\n", m_width, m_height);
+	printf("Render size: %ix%i\n", m_width, m_height);
 
 	if (!InitResources())
 	{
@@ -150,7 +152,7 @@ void Graphics::OnResize(int w, int h)
 		m_width = w;
 		m_height = h;
 		m_viewportDirty = true;
-		printf(" Resizing to: %ix%i\n", m_width, m_height);
+		printf("Resizing to: %ix%i\n", m_width, m_height);
 	}
 }
 
@@ -195,8 +197,27 @@ void Graphics::DrawSprite(Sprite* sprite)
 	glBindVertexArray(m_spriteMesh.ID);
 	glUseProgram(m_spritePipeline);
 	{
+		// Transforms:
 		glUniform2fv(glGetUniformLocation(m_spritePipeline, "uProjection"), 1, &projection.X);
 		glUniformMatrix3fv(glGetUniformLocation(m_spritePipeline, "uTransform"), 1, GL_FALSE, transform.Data[0]);
+
+		// Tint:
+		Color tint = sprite->GetTint();
+		glUniform4fv(glGetUniformLocation(m_spritePipeline, "uTint"), 1, &tint.R);
+
+		// Bind image:
+		glActiveTexture(GL_TEXTURE0);
+		const Image* img = sprite->GetImage();
+		if (img)
+		{
+			glBindTexture(GL_TEXTURE_2D, img->m_imageID);
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D, m_whiteImage->m_imageID);
+		}
+		glUniform1i(glGetUniformLocation(m_spritePipeline, "uImage"), 0);
+
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 	glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
@@ -269,6 +290,12 @@ bool Graphics::InitResources()
 		glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(kDummyVAO);
+
+	m_whiteImage = Image::CreateFromFile("../../Data/Waffle/Img/DefaultWhite.png");
+	if (!m_whiteImage)
+	{
+		return false;
+	}
 
 	return true;
 }

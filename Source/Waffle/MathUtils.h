@@ -113,6 +113,11 @@ namespace Waffle
 
 	struct Transform
 	{
+		Transform()
+			: Position(0.0f, 0.0f)
+			, Scale(1.0f, 1.0f)
+			, Rotation(0.0f)
+		{}
 		Vec2 Position;
 		Vec2 Scale;
 		// Rotation in degrees

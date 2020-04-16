@@ -1,0 +1,59 @@
+#include "Image.h"
+
+#include "glad/glad.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+using namespace Waffle;
+
+Image::Image()
+	: m_imageID(0)
+	, m_width(0)
+	, m_height(0)
+{
+}
+
+Image::~Image()
+{
+}
+
+Image* Waffle::Image::CreateFromFile(const char* path)
+{
+	int w, h, n;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* pData = stbi_load(path, &w, &h, &n, 0); // NOTE: we force textures to be RGBA
+	if (!pData)
+	{
+		printf("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());
+		return nullptr;
+	}
+	
+	Image* image = new Image;
+	image->m_width = w;
+	image->m_height = h;
+
+	// Create the GL texture:
+	glGenTextures(1, &image->m_imageID);
+	glBindTexture(GL_TEXTURE_2D, image->m_imageID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_POINT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_POINT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, pData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	stbi_image_free(pData);
+
+	return image;
+}
+
+int Image::GetWidth() const
+{
+	return m_width;
+}
+
+int Image::GetHeight() const
+{
+	return m_height;
+}
