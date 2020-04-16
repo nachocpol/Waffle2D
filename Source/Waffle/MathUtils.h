@@ -2,6 +2,7 @@
 
 #define PI 3.14159265359f
 #define DEG_TO_RAD (PI/180.0f)
+#define IS_POWER_OF_2(n) (n && !(n & (n - 1)))
 
 namespace Waffle
 {
