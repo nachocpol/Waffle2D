@@ -167,9 +167,9 @@ bool Window::Update()
 	MSG msg = {};
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		if (msg.message == WM_QUIT)
+		if (msg.message == WM_QUIT || msg.message == WM_DESTROY || msg.message == WM_CLOSE) // None gets triggered :)
 		{
-			open = true;
+			open = false;
 			break;
 		}
 		TranslateMessage(&msg);

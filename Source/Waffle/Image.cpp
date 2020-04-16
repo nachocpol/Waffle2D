@@ -22,10 +22,16 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 {
 	int w, h, n;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* pData = stbi_load(path, &w, &h, &n, 0); // NOTE: we force textures to be RGBA
+	unsigned char* pData = stbi_load(path, &w, &h, &n, 0);
 	if (!pData)
 	{
 		printf("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());
+		return nullptr;
+	}
+
+	if (n < 3)
+	{
+		printf("Can't load texture with %i channels! \n", n);
 		return nullptr;
 	}
 	
@@ -38,10 +44,13 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 	glBindTexture(GL_TEXTURE_2D, image->m_imageID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_POINT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_POINT);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, pData);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	GLint internalFmt = n == 3 ? GL_RGB : GL_RGBA8;
+	GLenum format = n == 3 ? GL_RGB : GL_RGBA;
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFmt, w, h, 0, format, GL_UNSIGNED_BYTE, pData);
+	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 	stbi_image_free(pData);
 

@@ -16,6 +16,7 @@ namespace Waffle
 		static Graphics& Get();
 		bool Init();
 		void OnResize(int w, int h);
+		bool Closed()const;
 		void Flush();
 		void ClearScreen(float r, float g, float b, float a);
 		void DrawSprite(Sprite* sprite);
@@ -32,6 +33,7 @@ namespace Waffle
 
 		bool m_initialized;
 		Window* m_window;
+		bool m_windowClosed;
 		void* m_renderContext;
 
 		bool m_viewportDirty;

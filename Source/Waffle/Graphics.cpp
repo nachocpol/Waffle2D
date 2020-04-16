@@ -50,6 +50,7 @@ static bool CreateShader(const char* path, GLenum type, unsigned int& shaderID)
 Graphics::Graphics()
 	: m_initialized(false)
 	, m_window(nullptr)
+	, m_windowClosed(false)
 	, m_renderContext(nullptr)
 	, m_spritePipeline(0)
 	, m_viewportDirty(false)
@@ -156,9 +157,14 @@ void Graphics::OnResize(int w, int h)
 	}
 }
 
+bool Graphics::Closed() const
+{
+	return m_windowClosed;
+}
+
 void Graphics::Flush()
 {
-	m_window->Update();
+	m_windowClosed = !m_window->Update();
 	SwapBuffers(GetDC((HWND)m_window->GetHandle()));
 }
 
