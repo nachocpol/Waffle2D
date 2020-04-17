@@ -22,5 +22,5 @@ Mat3 Transform::AsMatrix()
 	translate.Row0.Z = Position.X;
 	translate.Row1.Z = Position.Y;
 
-	return rotation * scale * translate;
+	return translate * rotation * scale;
 }

@@ -20,6 +20,13 @@ Sprite::Sprite(float sx, float sy, Image* image)
 {
 }
 
+Sprite::Sprite(const Sprite& other)
+	: m_size(other.m_size)
+	, m_image(other.m_image)
+	, m_tint(other.m_tint)
+{
+}
+
 void Sprite::SetPosition(float x, float y)
 {
 	m_transform.Position = Vec2(x, y);

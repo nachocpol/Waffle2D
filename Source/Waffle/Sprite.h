@@ -11,6 +11,7 @@ namespace Waffle
 		Sprite();
 		Sprite(float sx, float sy);
 		Sprite(float sx, float sy, Image* image); 
+		Sprite(const Sprite& other);
 		~Sprite() {};
 
 		void SetPosition(float x, float y);

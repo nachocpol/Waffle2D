@@ -193,19 +193,17 @@ void Graphics::DrawSprite(Sprite* sprite)
 
 	// Sprite transformation:
 	const Vec2 size = sprite->GetSize();
-	Mat3 transform;
-	transform.Row0.X *= size.X;
-	transform.Row1.Y *= size.Y;
-	
-	Mat3 spriteTrans = sprite->GetTransform().AsMatrix();
-	transform = transform * spriteTrans;
+	Transform transform = sprite->GetTransform();
+	transform.Scale.X *= size.X;
+	transform.Scale.Y *= size.Y;
+	Mat3 worldTransform = transform.AsMatrix();
 
 	glBindVertexArray(m_spriteMesh.ID);
 	glUseProgram(m_spritePipeline);
 	{
 		// Transforms:
 		glUniform2fv(glGetUniformLocation(m_spritePipeline, "uProjection"), 1, &projection.X);
-		glUniformMatrix3fv(glGetUniformLocation(m_spritePipeline, "uTransform"), 1, GL_FALSE, transform.Data[0]);
+		glUniformMatrix3fv(glGetUniformLocation(m_spritePipeline, "uTransform"), 1, GL_FALSE, worldTransform.Data[0]);
 
 		// Tint:
 		Color tint = sprite->GetTint();
