@@ -19,11 +19,14 @@ int main()
 
 	Image* img = Image::CreateFromFile("../../Data/Waffle/Img/ColorChecker.png");
 	
+	// Create one sprite and assign an image:
 	Sprite spriteImg(512, 256, img);
 	spriteImg.SetPosition(200.0f, 50.0f);
 	float rot = 0.0f;
 	
-	Sprite spriteImg2(spriteImg);
+	// Simple sprite (just tint)
+	Sprite spriteImg2(512, 256);
+	spriteImg2.SetTint(0.8f, 0.25f, 0.0f);
 	spriteImg2.SetPosition(-200.0f, -50.0f);
 
 	while (!graphics.Closed())
