@@ -1,14 +1,21 @@
 #include "FileUtils.h"
 
 #include <stdio.h>
-#include <string.h>
+
+#include <Windows.h>
 
 using namespace Waffle;
 
 bool File::ReadFile(const char* file, const char* data, long& size)
 {
+	std::string fixedPath(file);
+	if (!FileSystem::Get().FixupPath(fixedPath))
+	{
+		return false;
+	}
+
 	FILE* pFile = nullptr;
-	fopen_s(&pFile, file, "r");
+	fopen_s(&pFile, fixedPath.c_str(), "r");
 	if (!pFile)
 	{
 		return false;
@@ -25,3 +32,73 @@ bool File::ReadFile(const char* file, const char* data, long& size)
 	return true;
 }
 
+FileSystem::FileSystem()
+{
+}
+
+FileSystem::FileSystem(const FileSystem& other)
+{
+}
+
+FileSystem::~FileSystem()
+{
+}
+
+FileSystem& FileSystem::Get()
+{
+	static FileSystem* kInstance = nullptr;
+	if (!kInstance)
+	{
+		kInstance = new	FileSystem;
+		kInstance->AddFileDevice({ "Data/", FileDevice::Type::Assets, "data" });
+		kInstance->AddFileDevice({ "Source/Shaders/", FileDevice::Type::ShaderSource, "shaders" });
+	}
+	return *kInstance;
+}
+
+void FileSystem::AddFileDevice(FileDevice device)
+{
+	mDevices.push_back(device);
+}
+
+bool FileSystem::FixupPath(std::string& path)
+{
+	// Get path identifier:
+	size_t charPos = path.find(':');
+	if (charPos == std::string::npos)
+	{
+		return false;
+	}
+	std::string pathIdentifier;
+	pathIdentifier = std::string(path.c_str(), charPos);
+
+	// Try to match with a file device:
+	for (const FileDevice& device : mDevices)
+	{
+		if (device.Identifier == pathIdentifier)
+		{
+			std::string tempPath = path;
+			tempPath = tempPath.erase(0, charPos + 1);
+			tempPath.insert(0, device.RootPath);
+			if (FileExists(tempPath))
+			{
+				path = tempPath;
+				return true;
+			}
+			// Don't break, we can have more devices for this file type.
+		}
+	}
+
+	return false;
+}
+
+bool FileSystem::FileExists(const std::string& fixeupFile)
+{
+	DWORD res;
+	res = GetFileAttributesA(fixeupFile.c_str());
+	if (res == INVALID_FILE_ATTRIBUTES)
+	{
+		return false;
+	}
+	return true;
+}

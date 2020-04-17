@@ -1,10 +1,13 @@
 #include "Image.h"
 #include "MathUtils.h"
+#include "FileUtils.h"
 
 #include "glad/glad.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#include <string>
 
 using namespace Waffle;
 
@@ -21,9 +24,15 @@ Image::~Image()
 
 Image* Waffle::Image::CreateFromFile(const char* path)
 {
+	std::string fixedPath(path);
+	if (!FileSystem::Get().FixupPath(fixedPath))
+	{
+		return false;
+	}
+
 	int w, h, n;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* pData = stbi_load(path, &w, &h, &n, 0);
+	unsigned char* pData = stbi_load(fixedPath.c_str(), &w, &h, &n, 0);
 	if (!pData)
 	{
 		printf("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());

@@ -11,6 +11,7 @@ filter { "platforms:x64" }
 	}
 
 filter {"configurations:Debug"}
+	debugdir  "%{wks.location}"
 	libdirs
 	{
 	}
@@ -19,6 +20,7 @@ filter {"configurations:Debug"}
 	}
 
 filter {"configurations:Release"}
+	debugdir  "%{wks.location}"
 	libdirs
 	{
 	}
