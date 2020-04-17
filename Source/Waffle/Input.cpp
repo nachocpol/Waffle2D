@@ -24,22 +24,22 @@ void Input::SetState(InputState state)
 	m_state = state;
 }
 
-bool Waffle::Input::GetKeyPressed(InputState::Key::T key)
+bool Input::GetKeyPressed(Key::T key)
 {
-	return m_state.KeyState[key];
+	return Get().m_state.KeyState[key];
 }
 
-bool Waffle::Input::GetMouseButton(int idx) const
+bool Input::GetMouseButton(int idx)
 {
-	return m_state.MouseButtons[idx];
+	return Get().m_state.MouseButtons[idx];
 }
 
-int Waffle::Input::GetMouseX() const
+int Input::GetMouseX()
 {
-	return m_state.MouseX;
+	return Get().m_state.MouseX;
 }
 
-int Waffle::Input::GetMouseY() const
+int Input::GetMouseY()
 {
-	return m_state.MouseY;
+	return Get().m_state.MouseY;
 }

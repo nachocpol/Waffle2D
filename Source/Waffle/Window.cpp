@@ -11,6 +11,41 @@ using namespace Waffle;
 
 InputState g_inputState;
 
+static void KeyUpdate(WPARAM key, bool pressed)
+{
+	switch (key)
+	{
+		case VK_ESCAPE:
+		{
+			g_inputState.KeyState[Key::ESC] = pressed;		break;
+		}
+		case VK_LEFT:
+		{
+			g_inputState.KeyState[Key::Left] = pressed;		break;
+		}
+		case VK_RIGHT:
+		{
+			g_inputState.KeyState[Key::Right] = pressed;	break;
+		}
+		case VK_UP:
+		{
+			g_inputState.KeyState[Key::Up] = pressed;		break;
+		}
+		case VK_DOWN:
+		{
+			g_inputState.KeyState[Key::Down] = pressed;		break;
+		}
+		case VK_RETURN:
+		{
+			g_inputState.KeyState[Key::Enter] = pressed;	break;
+		}
+		case VK_SPACE:
+		{
+			g_inputState.KeyState[Key::Space] = pressed;	break;
+		}
+	}
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	Window* owner = (Window*)GetWindowLongPtrA(hWnd, -21);
@@ -32,61 +67,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+		case WM_MOUSEWHEEL:
+		{
+			int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+			g_inputState.MouseWheelDelta = delta < 0 ? -1 : 1;
+			break;
+		}
 		case WM_LBUTTONDOWN:
 		{
-			g_inputState.MouseButtons[0] = true;
-			break;
+			g_inputState.MouseButtons[0] = true;	break;
+		}
+		case WM_LBUTTONUP:
+		{
+			g_inputState.MouseButtons[0] = false;	break;
 		}
 		case WM_MBUTTONDOWN:
 		{
-			g_inputState.MouseButtons[1] = true;
-			break;
+			g_inputState.MouseButtons[1] = true;	break;
+		}
+		case WM_MBUTTONUP:
+		{
+			g_inputState.MouseButtons[1] = false;	break;
 		}
 		case WM_RBUTTONDOWN:
 		{
-			g_inputState.MouseButtons[2] = true;
-			break;
+			g_inputState.MouseButtons[2] = true;	break;
+		}
+		case WM_RBUTTONUP:
+		{
+			g_inputState.MouseButtons[2] = false;	break;
 		}
 		case WM_KEYDOWN:
 		{
-			switch (wParam)
-			{
-				case VK_ESCAPE:
-				{
-					g_inputState.KeyState[InputState::Key::ESC] = true;
-					break;
-				}
-				case VK_LEFT:
-				{
-					g_inputState.KeyState[InputState::Key::Left] = true;
-					break;
-				}
-				case VK_RIGHT:
-				{
-					g_inputState.KeyState[InputState::Key::Right] = true;
-					break;
-				}
-				case VK_UP:
-				{
-					g_inputState.KeyState[InputState::Key::Up] = true;
-					break;
-				}
-				case VK_DOWN:
-				{
-					g_inputState.KeyState[InputState::Key::Down] = true;
-					break;
-				}
-				case VK_RETURN:
-				{
-					g_inputState.KeyState[InputState::Key::Enter] = true;
-					break;
-				}
-				case VK_SPACE:
-				{
-					g_inputState.KeyState[InputState::Key::Space] = true;
-					break;
-				}
-			}
+			KeyUpdate(wParam, true);				break;
+		}
+		case WM_KEYUP:
+		{
+			KeyUpdate(wParam, false);				break;
 		}
 	}
 
@@ -165,8 +182,8 @@ int Window::GetHeight() const
 
 bool Window::Update()
 {
-	// Reset state:
-	memset(&g_inputState, 0, sizeof(g_inputState));
+	// Reset some state:
+	g_inputState.MouseWheelDelta = 0;
 
 	MSG msg = {};
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

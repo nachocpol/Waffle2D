@@ -2,11 +2,18 @@
 #include "Sprite.h"
 #include "Input.h"
 #include "Image.h"
+#include "Time.h"
 
 using namespace Waffle;
 
 int main()
 {
+	float totalTime = 0.0f;
+	float deltaTime = 0.0f;
+
+	Timer timer;
+	timer.Start();
+
 	Graphics& graphics = Graphics::Get();
 	graphics.Init();
 
@@ -21,17 +28,25 @@ int main()
 
 	while (!graphics.Closed())
 	{
-		if (Input::Get().GetKeyPressed(InputState::Key::Space))
+		timer.Start();
+
+		rot += 25.0f * deltaTime;
+		spriteImg.SetRotation(rot);
+		spriteImg2.SetRotation(-rot);
+
+		if (Input::GetKeyPressed(Key::Space))
 		{
-			rot += 10.0f;
-			spriteImg.SetRotation(rot);
-			spriteImg2.SetRotation(-rot);
+			rot = 0.0f;
 		}
-		
+
 		graphics.ClearScreen(0.5f, 0.5f, 0.5f, 1.0f);
 		graphics.DrawSprite(&spriteImg2);
 		graphics.DrawSprite(&spriteImg);
 		graphics.Flush();
+
+		// Update frame time:
+		deltaTime = timer.Stop() / 1000.0f;
+		totalTime += deltaTime;
 	}
 	return 0;
 }
