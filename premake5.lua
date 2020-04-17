@@ -7,7 +7,7 @@ workspace "Waffle2D"
 filter { "platforms:x64" }
 	includedirs 
 	{
-		"Source/Waffle"
+		"Source"
 	}
 
 filter {"configurations:Debug"}
@@ -34,8 +34,8 @@ project "Waffle2D"
 	targetdir "Build/%{cfg.platform}/%{cfg.buildcfg}"
 	files
 	{
-		"Source/Waffle/**.h",
-		"Source/Waffle/**.cpp",
+		"Source/**.h",
+		"Source/**.cpp",
 		"Depen/glad/src/**.c"
 	}
 	links
@@ -60,8 +60,8 @@ project "Test"
 	targetdir "Build/%{cfg.platform}/%{cfg.buildcfg}"
 	files
 	{
-		"Source/Test/**.h",
-		"Source/Test/**.cpp"
+		"Projects/Test/**.h",
+		"Projects/Test/**.cpp"
 	}
 	links
 	{

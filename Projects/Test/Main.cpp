@@ -17,7 +17,7 @@ int main()
 	Graphics& graphics = Graphics::Get();
 	graphics.Init();
 
-	Image* img = Image::CreateFromFile("../../Data/Waffle/Img/ColorChecker.png");
+	Image* img = Image::CreateFromFile("../../Data/Img/ColorChecker.png");
 	
 	// Create one sprite and assign an image:
 	Sprite spriteImg(512, 256, img);

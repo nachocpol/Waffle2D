@@ -233,12 +233,12 @@ bool Graphics::InitResources()
 	// Setup shaders:
 	m_spritePipeline = glCreateProgram();
 	unsigned int spriteVtxShader = 0;
-	if (!CreateShader("../../Source/Waffle/Shaders/Sprite.vert", GL_VERTEX_SHADER, spriteVtxShader))
+	if (!CreateShader("../../Source/Shaders/Sprite.vert", GL_VERTEX_SHADER, spriteVtxShader))
 	{
 		return false;
 	}
 	unsigned int spriteFragShader = 0;
-	if (!CreateShader("../../Source/Waffle/Shaders/Sprite.frag", GL_FRAGMENT_SHADER, spriteFragShader))
+	if (!CreateShader("../../Source/Shaders/Sprite.frag", GL_FRAGMENT_SHADER, spriteFragShader))
 	{
 		return false;
 	}
@@ -296,7 +296,7 @@ bool Graphics::InitResources()
 	}
 	glBindVertexArray(kDummyVAO);
 
-	m_whiteImage = Image::CreateFromFile("../../Data/Waffle/Img/DefaultWhite.png");
+	m_whiteImage = Image::CreateFromFile("../../Data/Img/DefaultWhite.png");
 	if (!m_whiteImage)
 	{
 		return false;
