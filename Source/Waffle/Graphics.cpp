@@ -165,6 +165,7 @@ bool Graphics::Closed() const
 void Graphics::Flush()
 {
 	m_windowClosed = !m_window->Update();
+
 	SwapBuffers(GetDC((HWND)m_window->GetHandle()));
 }
 

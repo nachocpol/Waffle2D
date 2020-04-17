@@ -17,6 +17,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+		case WM_DESTROY:
+		{
+			break;
+		}
 		case WM_SIZE:
 		{
 			int w = LOWORD(lParam);  
@@ -123,8 +127,9 @@ bool Window::Init(const char* displayName)
 	}
 
 	ULONG  style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE;
+	style = WS_OVERLAPPEDWINDOW | WS_MAXIMIZE;
 	m_handle = CreateWindowW(wc.lpszClassName, wstrName.c_str(), style, 0, 0, m_width, m_height, 0, 0, wc.hInstance, 0);
-	SetWindowLongPtr((HWND)m_handle, -21,(LONG_PTR)this); // GWL_USERDATA
+	SetWindowLongPtr((HWND)m_handle, -21, (LONG_PTR)this); // GWL_USERDATA
 	if (!m_handle)
 	{
 		return false;
@@ -163,13 +168,11 @@ bool Window::Update()
 	// Reset state:
 	memset(&g_inputState, 0, sizeof(g_inputState));
 
-	bool open = true;
 	MSG msg = {};
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		if (msg.message == WM_QUIT || msg.message == WM_DESTROY || msg.message == WM_CLOSE) // None gets triggered :)
+		if (msg.message == WM_QUIT)
 		{
-			open = false;
 			break;
 		}
 		TranslateMessage(&msg);
@@ -185,5 +188,5 @@ bool Window::Update()
 	}
 
 	Input::Get().SetState(g_inputState);
-	return open;
+	return true;
 }

@@ -23,19 +23,19 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 {
 	int w, h, n;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* pData = stbi_load(path, &w, &h, &n, 3);
+	unsigned char* pData = stbi_load(path, &w, &h, &n, 0);
 	if (!pData)
 	{
 		printf("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());
 		return nullptr;
 	}
 
-	bool pw2 = IS_POWER_OF_2(w);
-	bool pw23 = IS_POWER_OF_2(h);
-	if(!IS_POWER_OF_2(w) || !IS_POWER_OF_2(h))
+	// https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
+	// This could be fixed using glPixelStorei(GL_UNPACK_ALIGNMENT, #). I need to investigate it.
+	if(((w*n) % 4) != 0)
 	{
 		stbi_image_free(pData);
-		printf("Texture dimensions must be power of two: W:%i H:%i \n", w, h);
+		printf("Texture width invalid: %i * %i modulo 4 must be 0 \n", w, n);
 		return nullptr;
 	}
 	if (n < 3)
