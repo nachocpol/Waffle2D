@@ -22,6 +22,16 @@ namespace Waffle
 			struct { float X; float Y; };
 			struct { float R; float G; };
 		};
+
+		Vec2 operator+ (const Vec2& other)
+		{
+			return Vec2(this->X + other.X, this->Y + other.Y);
+		}
+
+		Vec2 operator* (const float& other)
+		{
+			return Vec2(this->X * other, this->Y * other);
+		}
 	};
 
 	struct Vec3

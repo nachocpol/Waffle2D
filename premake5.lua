@@ -74,3 +74,24 @@ project "Test"
 
 	filter "configurations:Release"
 		optimize "On"
+
+-- This is a hack.. I need to find a way to discover projects instead of hardcoding this here..
+project "LD46"
+	kind "ConsoleApp"
+	language "C++"
+	location "Temp/VSFiles"
+	targetdir "Build/%{cfg.platform}/%{cfg.buildcfg}"
+	files
+	{
+		"Projects/LD46/**.h",
+		"Projects/LD46/**.cpp"
+	}
+	links
+	{
+		"Waffle2D"
+	}
+	filter "configurations:Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		optimize "On"

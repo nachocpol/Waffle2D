@@ -1,3 +1,6 @@
 [submodule "Depen/stb"]
 	path = Depen/stb
 	url = https://github.com/nothings/stb.git
+[submodule "Projects/LD46"]
+	path = Projects/LD46
+	url = https://github.com/piluve/LD46-Untitled.git

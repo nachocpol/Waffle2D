@@ -55,6 +55,7 @@ Graphics::Graphics()
 	, m_spritePipeline(0)
 	, m_viewportDirty(false)
 	, m_whiteImage(nullptr)
+	, m_view(0.0f, 0.0f)
 {
 }
 
@@ -195,8 +196,15 @@ void Graphics::DrawSprite(Sprite* sprite)
 	// Sprite transformation:
 	const Vec2 size = sprite->GetSize();
 	Transform transform = sprite->GetTransform();
+
+	// Apply view (this could be done on the shader....):
+	transform.Position.X -= m_view.X;
+	transform.Position.Y -= m_view.Y;
+
+	// Apply sprite size:
 	transform.Scale.X *= size.X;
 	transform.Scale.Y *= size.Y;
+
 	Mat3 worldTransform = transform.AsMatrix();
 
 	glBindVertexArray(m_spriteMesh.ID);
@@ -226,6 +234,11 @@ void Graphics::DrawSprite(Sprite* sprite)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 	glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
+}
+
+void Graphics::SetView(Vec2 view)
+{
+	m_view = view;
 }
 
 bool Graphics::InitResources()

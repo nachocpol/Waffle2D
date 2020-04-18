@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MathUtils.h"
+
 namespace Waffle
 {
 	class Window;
@@ -20,6 +22,7 @@ namespace Waffle
 		void Flush();
 		void ClearScreen(float r, float g, float b, float a);
 		void DrawSprite(Sprite* sprite);
+		void SetView(Vec2 view);
 
 	private:
 		bool InitResources();
@@ -39,6 +42,8 @@ namespace Waffle
 		bool m_viewportDirty;
 		int m_width;
 		int m_height;
+
+		Vec2 m_view;
 
 		Image* m_whiteImage;
 	};

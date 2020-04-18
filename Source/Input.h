@@ -13,6 +13,10 @@ namespace Waffle
 			Space,
 			ESC,
 			Enter,
+			W,
+			A,
+			S,
+			D,
 			COUNT
 		};
 	};

@@ -43,6 +43,22 @@ static void KeyUpdate(WPARAM key, bool pressed)
 		{
 			g_inputState.KeyState[Key::Space] = pressed;	break;
 		}
+		case 87:
+		{
+			g_inputState.KeyState[Key::W] = pressed;	break;
+		}
+		case 65:
+		{
+			g_inputState.KeyState[Key::A] = pressed;	break;
+		}
+		case 83:
+		{
+			g_inputState.KeyState[Key::S] = pressed;	break;
+		}
+		case 68:
+		{
+			g_inputState.KeyState[Key::D] = pressed;	break;
+		}
 	}
 }
 
