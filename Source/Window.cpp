@@ -119,7 +119,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_KEYUP:
 		{
-			KeyUpdate(wParam, false);				break;
+ 			KeyUpdate(wParam, false);				break;
 		}
 	}
 
@@ -216,6 +216,7 @@ bool Window::Update()
 	POINT cursor;
 	if (GetCursorPos(&cursor))
 	{
+		ScreenToClient((HWND)m_handle, &cursor);
 		g_inputState.MouseX = cursor.x;
 		g_inputState.MouseY = cursor.y;
 	}

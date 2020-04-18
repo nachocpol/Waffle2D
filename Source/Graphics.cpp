@@ -241,6 +241,16 @@ void Graphics::SetView(Vec2 view)
 	m_view = view;
 }
 
+Vec2 Graphics::GetView() const
+{
+	return m_view;
+}
+
+Vec2 Graphics::GetCurViewport()
+{
+	return Vec2((float)m_width, (float)m_height);
+}
+
 bool Graphics::InitResources()
 {
 	// Setup shaders:

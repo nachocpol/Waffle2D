@@ -23,6 +23,8 @@ namespace Waffle
 		void ClearScreen(float r, float g, float b, float a);
 		void DrawSprite(Sprite* sprite);
 		void SetView(Vec2 view);
+		Vec2 GetView()const;
+		Vec2 GetCurViewport();
 
 	private:
 		bool InitResources();

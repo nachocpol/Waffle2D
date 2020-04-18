@@ -4,6 +4,11 @@
 #define DEG_TO_RAD (PI/180.0f)
 #define IS_POWER_OF_2(n) (n && !(n & (n - 1)))
 
+#include <cmath>
+
+#define clamp(n,mi,ma) fmin(ma, fmax(mi, n))
+#define saturate(n) fmin(1.0f, fmax(0.0f, n))
+
 namespace Waffle
 {
 	struct Vec2
@@ -26,6 +31,11 @@ namespace Waffle
 		Vec2 operator+ (const Vec2& other)
 		{
 			return Vec2(this->X + other.X, this->Y + other.Y);
+		}
+
+		Vec2 operator- (const Vec2& other)
+		{
+			return Vec2(this->X - other.X, this->Y - other.Y);
 		}
 
 		Vec2 operator* (const float& other)
@@ -65,6 +75,17 @@ namespace Waffle
 	static float Dot(const Vec3& a, const Vec3& b)
 	{
 		return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+	}
+
+	static float Length(const Vec2& a)
+	{
+		return sqrt(a.X*a.X + a.Y*a.Y);
+	}
+
+	static Vec2 Normalize(const Vec2& a)
+	{
+		float len = Length(a);
+		return Vec2(a.X / len, a.Y / len);
 	}
 
 	struct Mat3
