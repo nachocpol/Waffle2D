@@ -77,7 +77,7 @@ project "Test"
 
 -- This is a hack.. I need to find a way to discover projects instead of hardcoding this here..
 project "LD46"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "C++"
 	location "Temp/VSFiles"
 	targetdir "Build/%{cfg.platform}/%{cfg.buildcfg}"

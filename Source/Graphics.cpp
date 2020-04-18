@@ -8,10 +8,17 @@
 #include <cstdio>
 
 #include "glad/glad.h"
+#include "glad/glad_wgl.h"
 
 #include <windows.h>
 
 using namespace Waffle;
+
+void GLAPIENTRY GLDebugCallback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam)
+{
+	// fprintf
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+}
 
 // Utility method to create a shader from a source file.
 static bool CreateShader(const char* path, GLenum type, unsigned int& shaderID)
@@ -89,22 +96,22 @@ bool Graphics::Init()
 		return false;
 	}
 
-	// Init GL context:
+	// Init dummy GL context:
 	PIXELFORMATDESCRIPTOR pfd =
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),
 		1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
-		PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
-		32,                   // Colordepth of the framebuffer.
+		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,		// Flags
+		PFD_TYPE_RGBA,													// The kind of framebuffer. RGBA or palette.
+		32,																// Colordepth of the framebuffer.
 		0, 0, 0, 0, 0, 0,
 		0,
 		0,
 		0,
 		0, 0, 0, 0,
-		24,                   // Number of bits for the depthbuffer
-		8,                    // Number of bits for the stencilbuffer
-		0,                    // Number of Aux buffers in the framebuffer.
+		24,																// Number of bits for the depthbuffer
+		8,																// Number of bits for the stencilbuffer
+		0,																// Number of Aux buffers in the framebuffer.
 		PFD_MAIN_PLANE,
 		0,
 		0, 0, 0
@@ -117,14 +124,64 @@ bool Graphics::Init()
 		return false;
 	}
 
-	m_renderContext = wglCreateContext(handleToDevice);
-	if (!wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext))
+	HGLRC dummyContext = wglCreateContext(handleToDevice);
+	if (!wglMakeCurrent(handleToDevice, dummyContext))
 	{
 		return false;
 	}
 
 	gladLoadGL();
-	printf("OpenGl version:%s\n", glGetString(GL_VERSION));
+	gladLoadWGL(handleToDevice);
+
+	// Create final context:
+	//const int attribList[] =
+	//{
+	//	WGL_DRAW_TO_WINDOW_ARB,		GL_TRUE,
+	//	WGL_SUPPORT_OPENGL_ARB,		GL_TRUE,
+	//	WGL_DOUBLE_BUFFER_ARB,		GL_TRUE,
+	//	WGL_PIXEL_TYPE_ARB,			WGL_TYPE_RGBA_ARB,
+	//	WGL_COLOR_BITS_ARB,			32,
+	//	WGL_DEPTH_BITS_ARB,			24,
+	//	WGL_STENCIL_BITS_ARB,		8,
+	//	0, // End
+	//};
+	//
+	//UINT maxFormats;
+	//int pixelFormat;
+	//if (wglChoosePixelFormatARB(handleToDevice, attribList, NULL, 1, &pixelFormat, &maxFormats))
+	//{
+	//	SetPixelFormat(handleToDevice,pixelFormat,????)
+	//}
+
+	int contextAttribs[] =
+	{
+		WGL_CONTEXT_MAJOR_VERSION_ARB,4,
+		WGL_CONTEXT_MINOR_VERSION_ARB,5,
+		WGL_CONTEXT_FLAGS_ARB , WGL_CONTEXT_DEBUG_BIT_ARB,
+		0,
+	};
+	m_renderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
+	if (!m_renderContext)
+	{
+		printf("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
+		return false;
+	}
+	
+	if (!wglDeleteContext(dummyContext))
+	{
+		printf("Failed to delete dummy context \n");
+	}
+
+	wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext);
+
+	// Setup debugging, should be enabled by default as we are already passing debug flag during context creation:
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(GLDebugCallback, nullptr);
+
+	printf("OpenGl version: %s\n", glGetString(GL_VERSION));
+	printf(" Vendor: %s\n", glGetString(GL_VENDOR));
+	printf(" Renderer name: %s\n", glGetString(GL_RENDERER));
+	printf(" GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	m_width = m_window->GetWidth();
 	m_height = m_window->GetHeight();
@@ -163,11 +220,15 @@ bool Graphics::Closed() const
 	return m_windowClosed;
 }
 
-void Graphics::Flush()
+void Waffle::Graphics::BeginFrame()
 {
 	m_windowClosed = !m_window->Update();
+}
 
-	SwapBuffers(GetDC((HWND)m_window->GetHandle()));
+void Graphics::Flush()
+{
+	HDC deviceHandle = GetDC((HWND)m_window->GetHandle());
+	SwapBuffers(deviceHandle);
 }
 
 void Graphics::ClearScreen(float r, float g, float b, float a)
@@ -297,19 +358,24 @@ bool Graphics::InitResources()
 	// Quad VAO
 	struct Vertex
 	{
+		Vertex() 
+		{}
+		Vertex(Vec2 p, Vec2 tc)
+			: Position(p)
+			, TexCoord(tc)
+		{}
 		Vec2 Position;
 		Vec2 TexCoord;
-		Color Color0;
 	}verts[6];
 
 	float sz = 0.5f;
-	verts[0] = { { sz, sz}, {1.0f, 1.0f}, {1.0f,1.0f,1.0f,1.0f} };
-	verts[1] = { { sz,-sz}, {1.0f, 0.0f}, {1.0f,1.0f,1.0f,1.0f} };
-	verts[2] = { {-sz,-sz}, {0.0f, 0.0f}, {1.0f,1.0f,1.0f,1.0f} };
+	verts[0] = { { sz, sz}, {1.0f, 1.0f} };
+	verts[1] = { { sz,-sz}, {1.0f, 0.0f} };
+	verts[2] = { {-sz,-sz}, {0.0f, 0.0f} };
 
-	verts[3] = { {-sz, sz}, {0.0f, 1.0f}, {1.0f,1.0f,1.0f,1.0f} };
-	verts[4] = { { sz, sz}, {1.0f, 1.0f}, {1.0f,1.0f,1.0f,1.0f} };
-	verts[5] = { {-sz,-sz}, {0.0f, 0.0f}, {1.0f,1.0f,1.0f,1.0f} };
+	verts[3] = { {-sz, sz}, {0.0f, 1.0f} };
+	verts[4] = { { sz, sz}, {1.0f, 1.0f} };
+	verts[5] = { {-sz,-sz}, {0.0f, 0.0f} };
 
 	glGenVertexArrays(1, &m_spriteMesh.ID);
 	glBindVertexArray(m_spriteMesh.ID);
@@ -321,10 +387,12 @@ bool Graphics::InitResources()
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vtxSize, (void*)0);
 		glEnableVertexAttribArray(0);
+
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vtxSize, (void*)(sizeof(Vec2)));
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, vtxSize, (void*)(sizeof(Vec2) * 2));
-		glEnableVertexAttribArray(2);
+
+		//glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, vtxSize, (void*)(sizeof(Vec2) * 2));
+		//glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(kDummyVAO);
 

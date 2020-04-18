@@ -1,5 +1,8 @@
 #pragma once
 
+static void* g_hinstance = 0;
+static int g_cmdShow = 0;
+
 namespace Waffle
 {
 	class Window

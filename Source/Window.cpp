@@ -70,6 +70,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_DESTROY:
 		{
+			PostQuitMessage(0);
 			break;
 		}
 		case WM_SIZE:
@@ -150,9 +151,9 @@ bool Window::Init(const char* displayName)
 
 	WNDCLASS wc = {};
 	wc.lpfnWndProc = WndProc;
-	wc.hInstance = GetModuleHandle(NULL);
+	wc.hInstance = (HINSTANCE)g_hinstance;
 	wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
-	wc.lpszClassName = wstrName.c_str();
+	wc.lpszClassName = L"TestWin";
 	wc.style = CS_OWNDC;
 	if (!RegisterClass(&wc))
 	{
@@ -161,7 +162,7 @@ bool Window::Init(const char* displayName)
 
 	ULONG  style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE;
 	style = WS_OVERLAPPEDWINDOW | WS_MAXIMIZE;
-	m_handle = CreateWindowW(wc.lpszClassName, wstrName.c_str(), style, 0, 0, m_width, m_height, 0, 0, wc.hInstance, 0);
+	m_handle = CreateWindowW(L"TestWin", wstrName.c_str(), style, 0, 0, m_width, m_height, 0, 0, (HINSTANCE)g_hinstance, 0);
 	SetWindowLongPtr((HWND)m_handle, -21, (LONG_PTR)this); // GWL_USERDATA
 	if (!m_handle)
 	{
@@ -201,11 +202,15 @@ bool Window::Update()
 	// Reset some state:
 	g_inputState.MouseWheelDelta = 0;
 
+	bool open = true;
+
 	MSG msg = {};
+	memset(&msg, 0, sizeof(MSG));
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
 		if (msg.message == WM_QUIT)
 		{
+			open = false;
 			break;
 		}
 		TranslateMessage(&msg);
@@ -222,5 +227,5 @@ bool Window::Update()
 	}
 
 	Input::Get().SetState(g_inputState);
-	return true;
+	return open;
 }

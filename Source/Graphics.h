@@ -19,6 +19,7 @@ namespace Waffle
 		bool Init();
 		void OnResize(int w, int h);
 		bool Closed()const;
+		void BeginFrame();
 		void Flush();
 		void ClearScreen(float r, float g, float b, float a);
 		void DrawSprite(Sprite* sprite);

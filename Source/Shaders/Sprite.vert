@@ -2,7 +2,6 @@
 
 in vec2 Position;
 in vec2 TexCoord;
-in vec4 Color0;
 
 out vec2 vTexCoord;
 
