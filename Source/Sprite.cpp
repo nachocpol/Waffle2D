@@ -67,6 +67,17 @@ Transform Sprite::GetTransform() const
 	return m_transform;
 }
 
+void Sprite::Move(float dx, float dy)
+{
+	m_transform.Position.X += dx;
+	m_transform.Position.Y += dy;
+}
+
+void Sprite::Rotate(float dr)
+{
+	m_transform.Rotation += dr;
+}
+
 const Image* Sprite::GetImage()const
 {
 	return m_image;

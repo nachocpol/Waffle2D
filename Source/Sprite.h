@@ -20,6 +20,8 @@ namespace Waffle
 		void SetSize(float sx, float sy);
 		Vec2 GetSize()const;
 		Transform GetTransform()const;
+		void Move(float dx, float dy);
+		void Rotate(float dr);
 		
 		void SetTint(float r, float g, float b, float a = 1.0f);
 		Color GetTint()const;
