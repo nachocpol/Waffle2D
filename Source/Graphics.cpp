@@ -198,8 +198,11 @@ void Graphics::DrawSprite(Sprite* sprite)
 	Transform transform = sprite->GetTransform();
 
 	// Apply view (this could be done on the shader....):
-	transform.Position.X -= m_view.X;
-	transform.Position.Y -= m_view.Y;
+	if (!sprite->GetIsUI())
+	{
+		transform.Position.X -= m_view.X;
+		transform.Position.Y -= m_view.Y;
+	}
 
 	// Apply sprite size:
 	transform.Scale.X *= size.X;
@@ -217,6 +220,12 @@ void Graphics::DrawSprite(Sprite* sprite)
 		// Tint:
 		Color tint = sprite->GetTint();
 		glUniform4fv(glGetUniformLocation(m_spritePipeline, "uTint"), 1, &tint.R);
+
+		// Scale and bias
+		Vec2 imgScale = sprite->GetImageScale();
+		Vec2 imgBias = sprite->GetImageBias();
+		float scaleBias[4] = { imgScale.X, imgScale.Y, imgBias.X, imgBias.Y };
+		glUniform4fv(glGetUniformLocation(m_spritePipeline, "uScaleBias"), 1, scaleBias);
 
 		// Bind image:
 		glActiveTexture(GL_TEXTURE0);

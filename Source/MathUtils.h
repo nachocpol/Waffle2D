@@ -2,6 +2,7 @@
 
 #define PI 3.14159265359f
 #define DEG_TO_RAD (PI/180.0f)
+#define RAD_TO_DEG (180.0f/PI)
 #define IS_POWER_OF_2(n) (n && !(n & (n - 1)))
 
 #include <cmath>
@@ -75,6 +76,11 @@ namespace Waffle
 	static float Dot(const Vec3& a, const Vec3& b)
 	{
 		return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+	}
+
+	static float Dot(const Vec2& a, const Vec2& b)
+	{
+		return a.X * b.X + a.Y * b.Y;
 	}
 
 	static float Length(const Vec2& a)
