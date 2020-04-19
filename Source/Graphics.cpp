@@ -4,6 +4,7 @@
 #include "MathUtils.h"
 #include "Sprite.h"
 #include "Image.h"
+#include "Logging.h"
 
 #include <cstdio>
 
@@ -16,8 +17,14 @@ using namespace Waffle;
 
 void GLAPIENTRY GLDebugCallback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam)
 {
-	// fprintf
-	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+	if (type == GL_DEBUG_TYPE_ERROR)
+	{
+		ERR("GL CALLBACK: message = %s\n", message);
+	}
+	else
+	{
+		WARN("GL CALLBACK: message = %s\n", message);
+	}
 }
 
 // Utility method to create a shader from a source file.
@@ -41,7 +48,7 @@ static bool CreateShader(const char* path, GLenum type, unsigned int& shaderID)
 			{
 				char info[512];
 				glGetShaderInfoLog(shaderID, 512, nullptr, info);
-				printf("Shader compilation failed! \n %s \n %s", path, info);
+				ERR("Shader compilation failed! \n %s \n %s", path, info);
 			}
 			else
 			{
@@ -133,26 +140,6 @@ bool Graphics::Init()
 	gladLoadGL();
 	gladLoadWGL(handleToDevice);
 
-	// Create final context:
-	//const int attribList[] =
-	//{
-	//	WGL_DRAW_TO_WINDOW_ARB,		GL_TRUE,
-	//	WGL_SUPPORT_OPENGL_ARB,		GL_TRUE,
-	//	WGL_DOUBLE_BUFFER_ARB,		GL_TRUE,
-	//	WGL_PIXEL_TYPE_ARB,			WGL_TYPE_RGBA_ARB,
-	//	WGL_COLOR_BITS_ARB,			32,
-	//	WGL_DEPTH_BITS_ARB,			24,
-	//	WGL_STENCIL_BITS_ARB,		8,
-	//	0, // End
-	//};
-	//
-	//UINT maxFormats;
-	//int pixelFormat;
-	//if (wglChoosePixelFormatARB(handleToDevice, attribList, NULL, 1, &pixelFormat, &maxFormats))
-	//{
-	//	SetPixelFormat(handleToDevice,pixelFormat,????)
-	//}
-
 	int contextAttribs[] =
 	{
 		WGL_CONTEXT_MAJOR_VERSION_ARB,4,
@@ -163,13 +150,13 @@ bool Graphics::Init()
 	m_renderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
 	if (!m_renderContext)
 	{
-		printf("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
+		ERR("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
 		return false;
 	}
 	
 	if (!wglDeleteContext(dummyContext))
 	{
-		printf("Failed to delete dummy context \n");
+		ERR("Failed to delete dummy context \n");
 	}
 
 	wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext);
@@ -178,14 +165,14 @@ bool Graphics::Init()
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(GLDebugCallback, nullptr);
 
-	printf("OpenGl version: %s\n", glGetString(GL_VERSION));
-	printf(" Vendor: %s\n", glGetString(GL_VENDOR));
-	printf(" Renderer name: %s\n", glGetString(GL_RENDERER));
-	printf(" GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	INFO("OpenGl version: %s\n", glGetString(GL_VERSION));
+	INFO(" Vendor: %s\n", glGetString(GL_VENDOR));
+	INFO(" Renderer name: %s\n", glGetString(GL_RENDERER));
+	INFO(" GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	m_width = m_window->GetWidth();
 	m_height = m_window->GetHeight();
-	printf("Render size: %ix%i\n", m_width, m_height);
+	INFO("Render size: %ix%i\n", m_width, m_height);
 
 	if (!InitResources())
 	{
@@ -211,7 +198,7 @@ void Graphics::OnResize(int w, int h)
 		m_width = w;
 		m_height = h;
 		m_viewportDirty = true;
-		printf("Resizing to: %ix%i\n", m_width, m_height);
+		INFO("Resizing to: %ix%i\n", m_width, m_height);
 	}
 }
 
@@ -345,7 +332,7 @@ bool Graphics::InitResources()
 	{
 		char info[512];
 		glGetProgramInfoLog(m_spritePipeline, 512, nullptr, info);
-		printf("Failed to link the program! \n %s", info);
+		ERR("Failed to link the program! \n %s", info);
 	}
 	glDeleteShader(spriteFragShader);
 	glDeleteShader(spriteVtxShader);

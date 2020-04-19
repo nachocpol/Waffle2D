@@ -1,6 +1,7 @@
 #include "Image.h"
 #include "MathUtils.h"
 #include "FileUtils.h"
+#include "Logging.h"
 
 #include "glad/glad.h"
 
@@ -35,7 +36,7 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 	unsigned char* pData = stbi_load(fixedPath.c_str(), &w, &h, &n, 0);
 	if (!pData)
 	{
-		printf("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());
+		ERR("Failed to create the image (%s) \n INFO:%s\n", path, stbi_failure_reason());
 		return nullptr;
 	}
 
@@ -44,13 +45,13 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 	if(((w*n) % 4) != 0)
 	{
 		stbi_image_free(pData);
-		printf("Texture width invalid: %i * %i modulo 4 must be 0 \n", w, n);
+		ERR("Texture width invalid: %i * %i modulo 4 must be 0 \n", w, n);
 		return nullptr;
 	}
 	if (n < 3)
 	{
 		stbi_image_free(pData);
-		printf("Can't load texture with %i channels! \n", n);
+		ERR("Can't load texture with %i channels! \n", n);
 		return nullptr;
 	}
 	
