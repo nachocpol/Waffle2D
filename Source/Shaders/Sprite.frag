@@ -15,7 +15,7 @@ void main()
     vec4 img = textureLod(uImage, curTexCoord, 0.0); // Texture is sRGB!
     oColor.rgb = img.rgb * uTint.rgb;
     oColor.rgb = pow(oColor.rgb,vec3(0.4545)); // Gamma correction.
-    oColor.a = 1.0; // meh
+    oColor.a = uTint.a;
     
     if(img.a < 0.9)
     {
