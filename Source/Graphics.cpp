@@ -70,6 +70,7 @@ Graphics::Graphics()
 	, m_viewportDirty(false)
 	, m_whiteImage(nullptr)
 	, m_view(0.0f, 0.0f)
+	, m_renderScale(1.0f)
 {
 }
 
@@ -242,8 +243,8 @@ void Graphics::DrawSprite(Sprite* sprite)
 	}
 
 	// Simple orthographic projection:
-	float w = (float)m_width;
-	float h = (float)m_height;
+	float w = (float)m_width  * m_renderScale; 
+	float h = (float)m_height * m_renderScale;
 	Vec2 projection = Vec2(1.0f / (w * 0.5f), 1.0f / (h * 0.5f));
 
 	// Sprite transformation:
@@ -311,6 +312,11 @@ Vec2 Graphics::GetView() const
 Vec2 Graphics::GetCurViewport()
 {
 	return Vec2((float)m_width, (float)m_height);
+}
+
+void Graphics::SetRenderScale(float scale)
+{
+	m_renderScale = scale;
 }
 
 bool Graphics::InitResources()
@@ -382,9 +388,6 @@ bool Graphics::InitResources()
 
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vtxSize, (void*)(sizeof(Vec2)));
 		glEnableVertexAttribArray(1);
-
-		//glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, vtxSize, (void*)(sizeof(Vec2) * 2));
-		//glEnableVertexAttribArray(2);
 	}
 	glBindVertexArray(kDummyVAO);
 

@@ -26,6 +26,7 @@ namespace Waffle
 		void SetView(Vec2 view);
 		Vec2 GetView()const;
 		Vec2 GetCurViewport();
+		void SetRenderScale(float scale);
 
 	private:
 		bool InitResources();
@@ -46,6 +47,7 @@ namespace Waffle
 		int m_width;
 		int m_height;
 
+		float m_renderScale;
 		Vec2 m_view;
 
 		Image* m_whiteImage;
