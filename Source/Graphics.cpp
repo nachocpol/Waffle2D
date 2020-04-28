@@ -1,4 +1,4 @@
-#include "Graphics.h"
+﻿#include "Graphics.h"
 #include "Window.h"
 #include "FileUtils.h"
 #include "MathUtils.h"
@@ -141,31 +141,40 @@ bool Graphics::Init()
 	gladLoadGL();
 	gladLoadWGL(handleToDevice);
 
-	int contextAttribs[] =
+	// Check if we can use the context extension:
+	if (GLAD_WGL_ARB_create_context)
 	{
-		WGL_CONTEXT_MAJOR_VERSION_ARB,4,
-		WGL_CONTEXT_MINOR_VERSION_ARB,5,
-		WGL_CONTEXT_FLAGS_ARB , WGL_CONTEXT_DEBUG_BIT_ARB,
-		0,
-	};
-	m_renderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
-	if (!m_renderContext)
+		int contextAttribs[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB,4,
+			WGL_CONTEXT_MINOR_VERSION_ARB,5,
+			WGL_CONTEXT_FLAGS_ARB , WGL_CONTEXT_DEBUG_BIT_ARB,
+			0,
+		};
+
+		m_renderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
+		if (!m_renderContext)
+		{
+			ERR("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
+			return false;
+		}
+		if (!wglDeleteContext(dummyContext))
+		{
+			ERR("Failed to delete dummy context \n");
+		}
+
+		wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext);
+	
+		// Setup debugging, should be enabled by default as we are already passing debug flag during context creation:
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(GLDebugCallback, nullptr);
+	}
+	else
 	{
-		ERR("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
-		return false;
+		INFO("The WGL_ARB_create_context extension is not availiable. \n ");
+		m_renderContext = dummyContext;
 	}
 	
-	if (!wglDeleteContext(dummyContext))
-	{
-		ERR("Failed to delete dummy context \n");
-	}
-
-	wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext);
-
-	// Setup debugging, should be enabled by default as we are already passing debug flag during context creation:
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(GLDebugCallback, nullptr);
-
 	INFO("OpenGl version: %s\n", glGetString(GL_VERSION));
 	INFO(" Vendor: %s\n", glGetString(GL_VENDOR));
 	INFO(" Renderer name: %s\n", glGetString(GL_RENDERER));
@@ -336,6 +345,10 @@ bool Graphics::InitResources()
 
 	glAttachShader(m_spritePipeline, spriteVtxShader);
 	glAttachShader(m_spritePipeline, spriteFragShader);
+
+	glBindAttribLocation(m_spritePipeline, 0, "aPosition");
+	glBindAttribLocation(m_spritePipeline, 1, "aTexCoord");
+
 	glLinkProgram(m_spritePipeline);
 	int res = 0;
 	glGetProgramiv(m_spritePipeline, GL_LINK_STATUS, &res);

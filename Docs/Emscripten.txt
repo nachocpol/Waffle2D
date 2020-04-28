@@ -1,0 +1,10 @@
+
+Emscripten compiles C++/C code into JS/WASM. Stuff like OpenGL is also supported.
+
+To install it follow the instructions in: https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install
+
+To run  the commands use emsdk.py
+
+Then you can open the console as they ask and test the programs. By default, the ouput goes to the emscripten folder.
+Tutorial here: https://emscripten.org/docs/getting_started/Tutorial.html
+

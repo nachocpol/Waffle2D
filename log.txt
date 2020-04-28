@@ -1,0 +1,18 @@
+[INFORMATION](graphics.cpp)(207): Resizing to: 1842x1057
+ 
+[INFORMATION](graphics.cpp)(169): OpenGl version: 4.5.0 NVIDIA 432.00
+ 
+[INFORMATION](graphics.cpp)(170):  Vendor: NVIDIA Corporation
+ 
+[INFORMATION](graphics.cpp)(171):  Renderer name: GeForce GTX 960/PCIe/SSE2
+ 
+[INFORMATION](graphics.cpp)(172):  GLSL version: 4.50 NVIDIA
+ 
+[INFORMATION](graphics.cpp)(176): Render size: 1842x1057
+ 
+[WARNING](graphics.cpp)(26): GL CALLBACK: message = Buffer detailed info: Buffer object 1 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+ 
+[INFORMATION](game.cpp)(197): Roud prep
+ Round num: 1
+ Enemies for the round: 64
+ 
