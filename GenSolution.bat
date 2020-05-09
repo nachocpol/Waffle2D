@@ -1,2 +1,2 @@
-premake5.exe vs2017
+"Scripts/ProjectGenerator.py"
 pause
