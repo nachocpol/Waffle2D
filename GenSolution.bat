@@ -1,2 +1,2 @@
-"Scripts/ProjectGenerator.py"
+"Scripts/ProjectGenerator.py" Test
 pause

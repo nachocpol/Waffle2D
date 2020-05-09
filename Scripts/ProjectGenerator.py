@@ -1,11 +1,16 @@
+"""
+ProjectGenerator.py
+Utility to create a project. This script should be called using the GenSolution.bat ProjName
+"""
 import subprocess;
 import os;
 import shutil;
+import sys;
 
 CurDir = os.getcwd();
 print("Current dir is: " + CurDir);
 
-ProjName = "Test";
+ProjName = sys.argv[1];
 ProjPath = CurDir + "\\Projects\\" + ProjName;
 if os.path.exists(ProjPath) == False:
     print("Project doesn't exist");
