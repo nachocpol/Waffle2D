@@ -1,5 +1,5 @@
 #include "Window.h"
-#include "Graphics.h"
+#include "Graphics/Graphics.h"
 #include "Input.h"
 
 #include <string>

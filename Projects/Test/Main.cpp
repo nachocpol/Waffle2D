@@ -1,7 +1,7 @@
-#include "Graphics.h"
-#include "Sprite.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/Sprite.h"
+#include "Graphics/Image.h"
 #include "Input.h"
-#include "Image.h"
 #include "Time.h"
 
 using namespace Waffle;
@@ -31,6 +31,8 @@ int main()
 
 	while (!graphics.Closed())
 	{
+		graphics.BeginFrame();
+
 		timer.Start();
 
 		rot += 25.0f * deltaTime;
