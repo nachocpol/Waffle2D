@@ -1,6 +1,8 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Sprite.h"
 #include "Graphics/Image.h"
+#include "Graphics/Font.h"
+
 #include "Window.h"
 #include "Input.h"
 #include "Time.h"
@@ -34,6 +36,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	Sprite spriteImg2(512, 256);
 	spriteImg2.SetTint(0.8f, 0.25f, 0.0f);
 	spriteImg2.SetPosition(-200.0f, -50.0f);
+
+	auto hackFont = Font::CreateFromFile("data:Fonts/Hack/Hack-Regular.ttf");
 
 	while (!graphics.Closed())
 	{

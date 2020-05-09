@@ -13,5 +13,5 @@ namespace Waffle
 
 	private:
 		Image* m_FontImage;
-	}
-};
+	};
+}

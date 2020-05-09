@@ -28,7 +28,7 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 	std::string fixedPath(path);
 	if (!FileSystem::Get().FixupPath(fixedPath))
 	{
-		return false;
+		return nullptr;
 	}
 
 	int w, h, n;
