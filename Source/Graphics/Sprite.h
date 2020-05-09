@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "Graphics/MathUtils.h"
 
 namespace Waffle
 {

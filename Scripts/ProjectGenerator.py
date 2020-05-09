@@ -62,7 +62,7 @@ ConfigFile = open(ProjLuaPath,"a")
 
 ConfigFile.write("\n\n");
 ConfigFile.write("project \"{0}\"\n".format(ProjName));
-ConfigFile.write("\tkind \"ConsoleApp\"\n");
+ConfigFile.write("\tkind \"WindowedApp\"\n");
 ConfigFile.write("\tlanguage \"C++\"\n");
 ConfigFile.write("\tlocation \"../Temp/VSFiles\"\n");
 ConfigFile.write("\ttargetdir \"../Build/%{cfg.platform}/%{cfg.buildcfg}\"\n");

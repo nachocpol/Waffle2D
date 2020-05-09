@@ -1,4 +1,4 @@
-#include "Sprite.h"
+#include "Graphics/Sprite.h"
 
 using namespace Waffle;
 

@@ -1,9 +1,9 @@
-﻿#include "Graphics.h"
+﻿#include "Graphics/Graphics.h"
 #include "Window.h"
 #include "FileUtils.h"
-#include "MathUtils.h"
-#include "Sprite.h"
-#include "Image.h"
+#include "Graphics/MathUtils.h"
+#include "Graphics/Sprite.h"
+#include "Graphics/Image.h"
 #include "Logging.h"
 
 #include <cstdio>

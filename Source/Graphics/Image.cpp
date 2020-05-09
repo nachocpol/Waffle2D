@@ -1,5 +1,5 @@
-#include "Image.h"
-#include "MathUtils.h"
+#include "Graphics/Image.h"
+#include "Graphics/MathUtils.h"
 #include "FileUtils.h"
 #include "Logging.h"
 

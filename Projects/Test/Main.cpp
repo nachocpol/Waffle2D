@@ -1,13 +1,19 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Sprite.h"
 #include "Graphics/Image.h"
+#include "Window.h"
 #include "Input.h"
 #include "Time.h"
 
+#include <Windows.h>
+
 using namespace Waffle;
 
-int main()
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	g_hinstance = hInstance;
+	g_cmdShow = nCmdShow;
+
 	float totalTime = 0.0f;
 	float deltaTime = 0.0f;
 
