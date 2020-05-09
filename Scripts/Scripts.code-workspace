@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"array": "cpp",
+			"deque": "cpp",
+			"initializer_list": "cpp",
+			"list": "cpp",
+			"vector": "cpp",
+			"xhash": "cpp",
+			"xstring": "cpp",
+			"xutility": "cpp",
+			"mstd_iterator": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"string_view": "cpp"
+		},
+		"python.pythonPath": "C:\\Users\\Usuario\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
+	}
+}
