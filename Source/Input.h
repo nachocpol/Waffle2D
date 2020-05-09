@@ -47,6 +47,6 @@ namespace Waffle
 		void SetState(InputState state);
 
 	private:
-		InputState m_state;
+		InputState m_State;
 	};
 }

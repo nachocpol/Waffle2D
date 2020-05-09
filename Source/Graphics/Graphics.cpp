@@ -62,15 +62,15 @@ static bool CreateShader(const char* path, GLenum type, unsigned int& shaderID)
 }
 
 Graphics::Graphics()
-	: m_initialized(false)
-	, m_window(nullptr)
-	, m_windowClosed(false)
-	, m_renderContext(nullptr)
-	, m_spritePipeline(0)
-	, m_viewportDirty(false)
-	, m_whiteImage(nullptr)
-	, m_view(0.0f, 0.0f)
-	, m_renderScale(1.0f)
+	: m_Initialized(false)
+	, m_Window(nullptr)
+	, m_WindowClosed(false)
+	, m_RenderContext(nullptr)
+	, m_SpritePipeline(0)
+	, m_ViewportDirty(false)
+	, m_WhiteImage(nullptr)
+	, m_View(0.0f, 0.0f)
+	, m_RenderScale(1.0f)
 {
 }
 
@@ -92,14 +92,14 @@ unsigned int kDummyVAO = 0;
 
 bool Graphics::Init()
 {
-	if (m_initialized)
+	if (m_Initialized)
 	{
 		return true;
 	}
 
 	// Init window:
-	m_window = new Window;
-	if (!m_window->Init("Waffle2D"))
+	m_Window = new Window;
+	if (!m_Window->Init("Waffle2D"))
 	{
 		return false;
 	}
@@ -125,7 +125,7 @@ bool Graphics::Init()
 		0, 0, 0
 	};
 
-	HDC handleToDevice = GetDC((HWND)m_window->GetHandle());
+	HDC handleToDevice = GetDC((HWND)m_Window->GetHandle());
 	int pfId = ChoosePixelFormat(handleToDevice, &pfd);
 	if (!SetPixelFormat(handleToDevice, pfId, &pfd))
 	{
@@ -152,8 +152,8 @@ bool Graphics::Init()
 			0,
 		};
 
-		m_renderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
-		if (!m_renderContext)
+		m_RenderContext = wglCreateContextAttribsARB(handleToDevice, 0, contextAttribs);
+		if (!m_RenderContext)
 		{
 			ERR("Failed to create the opengl context using wglCreateContextAttribsARB \n ");
 			return false;
@@ -163,7 +163,7 @@ bool Graphics::Init()
 			ERR("Failed to delete dummy context \n");
 		}
 
-		wglMakeCurrent(handleToDevice, (HGLRC)m_renderContext);
+		wglMakeCurrent(handleToDevice, (HGLRC)m_RenderContext);
 	
 		// Setup debugging, should be enabled by default as we are already passing debug flag during context creation:
 		glEnable(GL_DEBUG_OUTPUT);
@@ -172,7 +172,7 @@ bool Graphics::Init()
 	else
 	{
 		INFO("The WGL_ARB_create_context extension is not availiable. \n ");
-		m_renderContext = dummyContext;
+		m_RenderContext = dummyContext;
 	}
 	
 	INFO("OpenGl version: %s\n", glGetString(GL_VERSION));
@@ -180,9 +180,9 @@ bool Graphics::Init()
 	INFO(" Renderer name: %s\n", glGetString(GL_RENDERER));
 	INFO(" GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	m_width = m_window->GetWidth();
-	m_height = m_window->GetHeight();
-	INFO("Render size: %ix%i\n", m_width, m_height);
+	m_Width = m_Window->GetWidth();
+	m_Height = m_Window->GetHeight();
+	INFO("Render size: %ix%i\n", m_Width, m_Height);
 
 	if (!InitResources())
 	{
@@ -196,7 +196,7 @@ bool Graphics::Init()
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_SCISSOR_TEST);
 	glDisable(GL_STENCIL_TEST);
-	glViewport(0, 0, m_width, m_height);
+	glViewport(0, 0, m_Width, m_Height);
 
 	// Blending:
 	glEnable(GL_BLEND);
@@ -208,28 +208,28 @@ bool Graphics::Init()
 
 void Graphics::OnResize(int w, int h)
 {
-	if (w != m_width || h != m_height)
+	if (w != m_Width || h != m_Height)
 	{
-		m_width = w;
-		m_height = h;
-		m_viewportDirty = true;
-		INFO("Resizing to: %ix%i\n", m_width, m_height);
+		m_Width = w;
+		m_Height = h;
+		m_ViewportDirty = true;
+		INFO("Resizing to: %ix%i\n", m_Width, m_Height);
 	}
 }
 
 bool Graphics::Closed() const
 {
-	return m_windowClosed;
+	return m_WindowClosed;
 }
 
 void Waffle::Graphics::BeginFrame()
 {
-	m_windowClosed = !m_window->Update();
+	m_WindowClosed = !m_Window->Update();
 }
 
 void Graphics::Flush()
 {
-	HDC deviceHandle = GetDC((HWND)m_window->GetHandle());
+	HDC deviceHandle = GetDC((HWND)m_Window->GetHandle());
 	SwapBuffers(deviceHandle);
 }
 
@@ -246,14 +246,14 @@ void Graphics::DrawSprite(Sprite* sprite)
 		return;
 	}
 
-	if (m_viewportDirty)
+	if (m_ViewportDirty)
 	{
-		glViewport(0, 0, m_width, m_height);
+		glViewport(0, 0, m_Width, m_Height);
 	}
 
 	// Simple orthographic projection:
-	float w = (float)m_width  * m_renderScale; 
-	float h = (float)m_height * m_renderScale;
+	float w = (float)m_Width  * m_RenderScale; 
+	float h = (float)m_Height * m_RenderScale;
 	Vec2 projection = Vec2(1.0f / (w * 0.5f), 1.0f / (h * 0.5f));
 
 	// Sprite transformation:
@@ -263,8 +263,8 @@ void Graphics::DrawSprite(Sprite* sprite)
 	// Apply view (this could be done on the shader....):
 	if (!sprite->GetIsUI())
 	{
-		transform.Position.X -= m_view.X;
-		transform.Position.Y -= m_view.Y;
+		transform.Position.X -= m_View.X;
+		transform.Position.Y -= m_View.Y;
 	}
 
 	// Apply sprite size:
@@ -273,35 +273,35 @@ void Graphics::DrawSprite(Sprite* sprite)
 
 	Mat3 worldTransform = transform.AsMatrix();
 
-	glBindVertexArray(m_spriteMesh.ID);
-	glUseProgram(m_spritePipeline);
+	glBindVertexArray(m_SpriteMesh.ID);
+	glUseProgram(m_SpritePipeline);
 	{
 		// Transforms:
-		glUniform2fv(glGetUniformLocation(m_spritePipeline, "uProjection"), 1, &projection.X);
-		glUniformMatrix3fv(glGetUniformLocation(m_spritePipeline, "uTransform"), 1, GL_FALSE, worldTransform.Data[0]);
+		glUniform2fv(glGetUniformLocation(m_SpritePipeline, "uProjection"), 1, &projection.X);
+		glUniformMatrix3fv(glGetUniformLocation(m_SpritePipeline, "uTransform"), 1, GL_FALSE, worldTransform.Data[0]);
 
 		// Tint:
 		Color tint = sprite->GetTint();
-		glUniform4fv(glGetUniformLocation(m_spritePipeline, "uTint"), 1, &tint.R);
+		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uTint"), 1, &tint.R);
 
 		// Scale and bias
 		Vec2 imgScale = sprite->GetImageScale();
 		Vec2 imgBias = sprite->GetImageBias();
 		float scaleBias[4] = { imgScale.X, imgScale.Y, imgBias.X, imgBias.Y };
-		glUniform4fv(glGetUniformLocation(m_spritePipeline, "uScaleBias"), 1, scaleBias);
+		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uScaleBias"), 1, scaleBias);
 
 		// Bind image:
 		glActiveTexture(GL_TEXTURE0);
 		const Image* img = sprite->GetImage();
 		if (img)
 		{
-			glBindTexture(GL_TEXTURE_2D, img->m_imageID);
+			glBindTexture(GL_TEXTURE_2D, img->m_ImageID);
 		}
 		else
 		{
-			glBindTexture(GL_TEXTURE_2D, m_whiteImage->m_imageID);
+			glBindTexture(GL_TEXTURE_2D, m_WhiteImage->m_ImageID);
 		}
-		glUniform1i(glGetUniformLocation(m_spritePipeline, "uImage"), 0);
+		glUniform1i(glGetUniformLocation(m_SpritePipeline, "uImage"), 0);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
@@ -310,28 +310,28 @@ void Graphics::DrawSprite(Sprite* sprite)
 
 void Graphics::SetView(Vec2 view)
 {
-	m_view = view;
+	m_View = view;
 }
 
 Vec2 Graphics::GetView() const
 {
-	return m_view;
+	return m_View;
 }
 
 Vec2 Graphics::GetCurViewport()
 {
-	return Vec2((float)m_width, (float)m_height);
+	return Vec2((float)m_Width, (float)m_Height);
 }
 
 void Graphics::SetRenderScale(float scale)
 {
-	m_renderScale = scale;
+	m_RenderScale = scale;
 }
 
 bool Graphics::InitResources()
 {
 	// Setup shaders:
-	m_spritePipeline = glCreateProgram();
+	m_SpritePipeline = glCreateProgram();
 	unsigned int spriteVtxShader = 0;
 	if (!CreateShader("shaders:Sprite.vert", GL_VERTEX_SHADER, spriteVtxShader))
 	{
@@ -343,19 +343,19 @@ bool Graphics::InitResources()
 		return false;
 	}
 
-	glAttachShader(m_spritePipeline, spriteVtxShader);
-	glAttachShader(m_spritePipeline, spriteFragShader);
+	glAttachShader(m_SpritePipeline, spriteVtxShader);
+	glAttachShader(m_SpritePipeline, spriteFragShader);
 
-	glBindAttribLocation(m_spritePipeline, 0, "aPosition");
-	glBindAttribLocation(m_spritePipeline, 1, "aTexCoord");
+	glBindAttribLocation(m_SpritePipeline, 0, "aPosition");
+	glBindAttribLocation(m_SpritePipeline, 1, "aTexCoord");
 
-	glLinkProgram(m_spritePipeline);
+	glLinkProgram(m_SpritePipeline);
 	int res = 0;
-	glGetProgramiv(m_spritePipeline, GL_LINK_STATUS, &res);
+	glGetProgramiv(m_SpritePipeline, GL_LINK_STATUS, &res);
 	if (!res)
 	{
 		char info[512];
-		glGetProgramInfoLog(m_spritePipeline, 512, nullptr, info);
+		glGetProgramInfoLog(m_SpritePipeline, 512, nullptr, info);
 		ERR("Failed to link the program! \n %s", info);
 	}
 	glDeleteShader(spriteFragShader);
@@ -388,12 +388,12 @@ bool Graphics::InitResources()
 	verts[4] = { { sz, sz}, {1.0f, 1.0f} };
 	verts[5] = { {-sz,-sz}, {0.0f, 0.0f} };
 
-	glGenVertexArrays(1, &m_spriteMesh.ID);
-	glBindVertexArray(m_spriteMesh.ID);
+	glGenVertexArrays(1, &m_SpriteMesh.ID);
+	glBindVertexArray(m_SpriteMesh.ID);
 	{
 		int vtxSize = sizeof(Vertex);
-		glGenBuffers(1, &m_spriteMesh.VertexBufferID);
-		glBindBuffer(GL_ARRAY_BUFFER, m_spriteMesh.VertexBufferID);
+		glGenBuffers(1, &m_SpriteMesh.VertexBufferID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_SpriteMesh.VertexBufferID);
 		glBufferData(GL_ARRAY_BUFFER, vtxSize * 6, verts, GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vtxSize, (void*)0);
@@ -404,8 +404,8 @@ bool Graphics::InitResources()
 	}
 	glBindVertexArray(kDummyVAO);
 
-	m_whiteImage = Image::CreateFromFile("data:Img/DefaultWhite.png");
-	if (!m_whiteImage)
+	m_WhiteImage = Image::CreateFromFile("data:Img/DefaultWhite.png");
+	if (!m_WhiteImage)
 	{
 		return false;
 	}

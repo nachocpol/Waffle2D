@@ -31,25 +31,25 @@ namespace Waffle
 	private:
 		bool InitResources();
 
-		unsigned int m_spritePipeline;
+		unsigned int m_SpritePipeline;
 		struct Mesh
 		{
 			unsigned int ID;
 			unsigned int VertexBufferID;
-		}m_spriteMesh;
+		}m_SpriteMesh;
 
-		bool m_initialized;
-		Window* m_window;
-		bool m_windowClosed;
-		void* m_renderContext;
+		bool m_Initialized;
+		Window* m_Window;
+		bool m_WindowClosed;
+		void* m_RenderContext;
 
-		bool m_viewportDirty;
-		int m_width;
-		int m_height;
+		bool m_ViewportDirty;
+		int m_Width;
+		int m_Height;
 
-		float m_renderScale;
-		Vec2 m_view;
+		float m_RenderScale;
+		Vec2 m_View;
 
-		Image* m_whiteImage;
+		Image* m_WhiteImage;
 	};
 }

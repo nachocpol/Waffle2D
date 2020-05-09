@@ -13,9 +13,9 @@
 using namespace Waffle;
 
 Image::Image()
-	: m_imageID(0)
-	, m_width(0)
-	, m_height(0)
+	: m_ImageID(0)
+	, m_Width(0)
+	, m_Height(0)
 {
 }
 
@@ -56,12 +56,12 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 	}
 	
 	Image* image = new Image;
-	image->m_width = w;
-	image->m_height = h;
+	image->m_Width = w;
+	image->m_Height = h;
 
 	// Create the GL texture:
-	glGenTextures(1, &image->m_imageID);
-	glBindTexture(GL_TEXTURE_2D, image->m_imageID);
+	glGenTextures(1, &image->m_ImageID);
+	glBindTexture(GL_TEXTURE_2D, image->m_ImageID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -79,10 +79,10 @@ Image* Waffle::Image::CreateFromFile(const char* path)
 
 int Image::GetWidth() const
 {
-	return m_width;
+	return m_Width;
 }
 
 int Image::GetHeight() const
 {
-	return m_height;
+	return m_Height;
 }

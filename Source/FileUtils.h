@@ -43,6 +43,6 @@ namespace Waffle
 		bool FileExists(const std::string& fixeupFile);
 
 	private:
-		std::vector<FileDevice> mDevices;
+		std::vector<FileDevice> m_Devices;
 	};
 }

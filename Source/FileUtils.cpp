@@ -58,7 +58,7 @@ FileSystem& FileSystem::Get()
 
 void FileSystem::AddFileDevice(FileDevice device)
 {
-	mDevices.push_back(device);
+	m_Devices.push_back(device);
 }
 
 bool FileSystem::FixupPath(std::string& path)
@@ -73,7 +73,7 @@ bool FileSystem::FixupPath(std::string& path)
 	pathIdentifier = std::string(path.c_str(), charPos);
 
 	// Try to match with a file device:
-	for (const FileDevice& device : mDevices)
+	for (const FileDevice& device : m_Devices)
 	{
 		if (device.Identifier == pathIdentifier)
 		{

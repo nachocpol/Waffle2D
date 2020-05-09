@@ -3,125 +3,125 @@
 using namespace Waffle;
 
 Sprite::Sprite()
-	: m_size(0, 0)
-	, m_image(nullptr)
-	, m_imageScale(1.0f, 1.0f)
-	, m_imageBias(0.0f, 0.0f)
-	, m_isUI(false)
+	: m_Size(0, 0)
+	, m_Image(nullptr)
+	, m_ImageScale(1.0f, 1.0f)
+	, m_ImageBias(0.0f, 0.0f)
+	, m_IsUI(false)
 {
 }
 
 Sprite::Sprite(float sx, float sy)
-	: m_size(sx,sy)
-	, m_image(nullptr)
-	, m_imageScale(1.0f, 1.0f)
-	, m_imageBias(0.0f, 0.0f)
-	, m_isUI(false)
+	: m_Size(sx,sy)
+	, m_Image(nullptr)
+	, m_ImageScale(1.0f, 1.0f)
+	, m_ImageBias(0.0f, 0.0f)
+	, m_IsUI(false)
 {
 }
 
 Sprite::Sprite(float sx, float sy, Image* image)
-	: m_size(sx, sy)
-	, m_image(image)
-	, m_imageScale(1.0f, 1.0f)
-	, m_imageBias(0.0f, 0.0f)
-	, m_isUI(false)
+	: m_Size(sx, sy)
+	, m_Image(image)
+	, m_ImageScale(1.0f, 1.0f)
+	, m_ImageBias(0.0f, 0.0f)
+	, m_IsUI(false)
 {
 }
 
 Sprite::Sprite(const Sprite& other)
-	: m_size(other.m_size)
-	, m_image(other.m_image)
-	, m_tint(other.m_tint)
-	, m_imageScale(other.m_imageScale)
-	, m_imageBias(other.m_imageBias)
-	, m_isUI(other.m_isUI)
+	: m_Size(other.m_Size)
+	, m_Image(other.m_Image)
+	, m_Tint(other.m_Tint)
+	, m_ImageScale(other.m_ImageScale)
+	, m_ImageBias(other.m_ImageBias)
+	, m_IsUI(other.m_IsUI)
 {
 }
 
 void Sprite::SetPosition(float x, float y)
 {
-	m_transform.Position = Vec2(x, y);
+	m_Transform.Position = Vec2(x, y);
 }
 
 void Sprite::SetScale(float x, float y)
 {
-	m_transform.Scale = Vec2(x, y);
+	m_Transform.Scale = Vec2(x, y);
 }
 
 void Sprite::SetRotation(float r)
 {
-	m_transform.Rotation = r;
+	m_Transform.Rotation = r;
 }
 
 Vec2 Sprite::GetSize() const
 {
-	return m_size;
+	return m_Size;
 }
 
 void Sprite::SetSize(float sx, float sy)
 {
-	m_size = Vec2(sx, sy);
+	m_Size = Vec2(sx, sy);
 }
 
 void Sprite::SetTint(float r, float g, float b, float a)
 {
-	m_tint = Color(r, g, b, a);
+	m_Tint = Color(r, g, b, a);
 }
 
 Color Sprite::GetTint() const
 {
-	return m_tint;
+	return m_Tint;
 }
 
 Transform Sprite::GetTransform() const
 {
-	return m_transform;
+	return m_Transform;
 }
 
 void Sprite::Move(float dx, float dy)
 {
-	m_transform.Position.X += dx;
-	m_transform.Position.Y += dy;
+	m_Transform.Position.X += dx;
+	m_Transform.Position.Y += dy;
 }
 
 void Sprite::Rotate(float dr)
 {
-	m_transform.Rotation += dr;
+	m_Transform.Rotation += dr;
 }
 
 const Image* Sprite::GetImage()const
 {
-	return m_image;
+	return m_Image;
 }
 
 void Sprite::SetImage(Image* image)
 {
-	m_image = image;
+	m_Image = image;
 }
 
 void Sprite::SetImageScaleBias(float su, float sv, float bu, float bv)
 {
-	m_imageScale = Vec2(su, sv);
-	m_imageBias = Vec2(bu, bv);
+	m_ImageScale = Vec2(su, sv);
+	m_ImageBias = Vec2(bu, bv);
 }
 
 Vec2 Sprite::GetImageScale() const
 {
-	return m_imageScale;
+	return m_ImageScale;
 }
 
 Vec2 Sprite::GetImageBias() const
 {
-	return m_imageBias;
+	return m_ImageBias;
 }
 
 void Sprite::SetIsUI(bool ui)
 {
-	m_isUI = ui;
+	m_IsUI = ui;
 }
 
 bool Sprite::GetIsUI()const
 {
-	return m_isUI;
+	return m_IsUI;
 }

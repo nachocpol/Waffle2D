@@ -11,7 +11,7 @@ namespace Waffle
 		// Returns elapsed time from the start point. Time in ms
 		float Stop();
 	private:
-		bool mStarted;
-		long long mStart;
+		bool m_Started;
+		long long m_Start;
 	};
 }

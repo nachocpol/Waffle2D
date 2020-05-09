@@ -6,7 +6,7 @@ using namespace Waffle;
 
 Input::Input()
 {
-	memset(&m_state, 0, sizeof(m_state));
+	memset(&m_State, 0, sizeof(m_State));
 }
 
 Input& Input::Get()
@@ -21,25 +21,25 @@ Input& Input::Get()
 
 void Input::SetState(InputState state)
 {
-	m_state = state;
+	m_State = state;
 }
 
 bool Input::GetKeyPressed(Key::T key)
 {
-	return Get().m_state.KeyState[key];
+	return Get().m_State.KeyState[key];
 }
 
 bool Input::GetMouseButton(int idx)
 {
-	return Get().m_state.MouseButtons[idx];
+	return Get().m_State.MouseButtons[idx];
 }
 
 int Input::GetMouseX()
 {
-	return Get().m_state.MouseX;
+	return Get().m_State.MouseX;
 }
 
 int Input::GetMouseY()
 {
-	return Get().m_state.MouseY;
+	return Get().m_State.MouseY;
 }

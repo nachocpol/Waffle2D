@@ -128,9 +128,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 Window::Window()
-	: m_handle(nullptr)
-	, m_width(1280)
-	, m_height(720)
+	: m_Handle(nullptr)
+	, m_Width(1280)
+	, m_Height(720)
 
 {
 }
@@ -141,7 +141,7 @@ Window::~Window()
 
 bool Window::Init(const char* displayName)
 {
-	if (m_handle)
+	if (m_Handle)
 	{
 		return true;
 	}
@@ -162,39 +162,39 @@ bool Window::Init(const char* displayName)
 
 	ULONG  style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE;
 	style = WS_OVERLAPPEDWINDOW | WS_MAXIMIZE;
-	m_handle = CreateWindowW(L"TestWin", wstrName.c_str(), style, 0, 0, m_width, m_height, 0, 0, (HINSTANCE)g_hinstance, 0);
-	SetWindowLongPtr((HWND)m_handle, -21, (LONG_PTR)this); // GWL_USERDATA
-	if (!m_handle)
+	m_Handle = CreateWindowW(L"TestWin", wstrName.c_str(), style, 0, 0, m_Width, m_Height, 0, 0, (HINSTANCE)g_hinstance, 0);
+	SetWindowLongPtr((HWND)m_Handle, -21, (LONG_PTR)this); // GWL_USERDATA
+	if (!m_Handle)
 	{
 		return false;
 	}
 
-	ShowWindow((HWND)m_handle, SW_SHOWMAXIMIZED);
-	UpdateWindow((HWND)m_handle);
+	ShowWindow((HWND)m_Handle, SW_SHOWMAXIMIZED);
+	UpdateWindow((HWND)m_Handle);
 
 	return true;
 }
 
 void* Window::GetHandle() const
 {
-	return m_handle;
+	return m_Handle;
 }
 
 void Window::Resized(int w, int h)
 {
-	m_width = w;
-	m_height = h;
+	m_Width = w;
+	m_Height = h;
 	Graphics::Get().OnResize(w, h);
 }
 
 int Window::GetWidth() const
 {
-	return m_width;
+	return m_Width;
 }
 
 int Window::GetHeight() const
 {
-	return m_height;
+	return m_Height;
 }
 
 bool Window::Update()
@@ -221,7 +221,7 @@ bool Window::Update()
 	POINT cursor;
 	if (GetCursorPos(&cursor))
 	{
-		ScreenToClient((HWND)m_handle, &cursor);
+		ScreenToClient((HWND)m_Handle, &cursor);
 		g_inputState.MouseX = cursor.x;
 		g_inputState.MouseY = cursor.y;
 	}

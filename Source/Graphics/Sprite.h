@@ -37,13 +37,13 @@ namespace Waffle
 		bool GetIsUI()const;
 
 	private:
-		Vec2 m_size;
-		Transform m_transform;
-		Color m_tint;
-		Image* m_image;
+		Vec2 m_Size;
+		Transform m_Transform;
+		Color m_Tint;
+		Image* m_Image;
 		
-		Vec2 m_imageScale;
-		Vec2 m_imageBias;
-		bool m_isUI;
+		Vec2 m_ImageScale;
+		Vec2 m_ImageBias;
+		bool m_IsUI;
 	};
 }

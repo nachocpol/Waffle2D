@@ -19,7 +19,7 @@ public:
 	void FlushToFile();
 
 private:
-	std::vector<std::string> m_log;
+	std::vector<std::string> m_Log;
 };
 
 #define OUT_DEBUG_STR(str) OutputDebugStringA(str);

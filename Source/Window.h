@@ -18,8 +18,8 @@ namespace Waffle
 		bool Update();
 
 	private:
-		void* m_handle;
-		int m_width;
-		int m_height;
+		void* m_Handle;
+		int m_Width;
+		int m_Height;
 	};
 }

@@ -12,7 +12,7 @@ Logger* Logger::Get()
 
 void Logger::Add(const char* msg)
 {
-	m_log.push_back(std::string(msg));
+	m_Log.push_back(std::string(msg));
 }
 
 void Logger::FlushToFile()
@@ -23,7 +23,7 @@ void Logger::FlushToFile()
 	{
 		return;
 	}
-	for (const auto l : m_log)
+	for (const auto l : m_Log)
 	{
 		fwrite(l.c_str(), sizeof(char), l.size(), logFile);
 	}
