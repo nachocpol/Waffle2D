@@ -14,18 +14,17 @@
 
 #include <windows.h>
 
-
 using namespace Waffle;
 
 void GLAPIENTRY GLDebugCallback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam)
 {
 	if (type == GL_DEBUG_TYPE_ERROR)
 	{
-		ERR("GL CALLBACK: message = %s\n", message);
+		ERR("GL CALLBACK: message = %s", message);
 	}
 	else
 	{
-		WARN("GL CALLBACK: message = %s\n", message);
+		WARN("GL CALLBACK: message = %s", message);
 	}
 }
 
@@ -173,18 +172,18 @@ bool Graphics::Init()
 	}
 	else
 	{
-		INFO("The WGL_ARB_create_context extension is not availiable. \n ");
+		INFO("The WGL_ARB_create_context extension is not availiable. ");
 		m_RenderContext = dummyContext;
 	}
 	
-	INFO("OpenGl version: %s\n", glGetString(GL_VERSION));
-	INFO(" Vendor: %s\n", glGetString(GL_VENDOR));
-	INFO(" Renderer name: %s\n", glGetString(GL_RENDERER));
-	INFO(" GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	INFO("OpenGl version: %s", glGetString(GL_VERSION));
+	INFO(" Vendor: %s", glGetString(GL_VENDOR));
+	INFO(" Renderer name: %s", glGetString(GL_RENDERER));
+	INFO(" GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	m_Width = m_Window->GetWidth();
 	m_Height = m_Window->GetHeight();
-	INFO("Render size: %ix%i\n", m_Width, m_Height);
+	INFO("Render size: %ix%i", m_Width, m_Height);
 
 	if (!InitResources())
 	{
@@ -215,7 +214,7 @@ void Graphics::OnResize(int w, int h)
 		m_Width = w;
 		m_Height = h;
 		m_ViewportDirty = true;
-		INFO("Resizing to: %ix%i\n", m_Width, m_Height);
+		INFO("Resizing to: %ix%i", m_Width, m_Height);
 	}
 }
 

@@ -2,6 +2,10 @@
 #include "Graphics/Sprite.h"
 #include "Graphics/Image.h"
 #include "Graphics/Font.h"
+#include "Audio/Audio.h"
+#include "Audio/AudioBuffer.h"
+#include "Audio/AudioSource.h"
+#include "Logging.h"
 
 #include "Window.h"
 #include "Input.h"
@@ -21,6 +25,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	Timer timer;
 	timer.Start();
+
+	// Test audio
+	Audio::Get().Init();
+	{
+		auto audioSrc = Audio::Get().CreateSource();
+		auto audioBuffer = AudioBuffer::CreateFromOGG("data:Audio/ExampleSong.ogg");
+		audioSrc->AttachBuffer(audioBuffer);
+		audioSrc->Play();
+	}
+
 
 	Graphics& graphics = Graphics::Get();
 	graphics.Init();
@@ -65,5 +79,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		deltaTime = timer.Stop() / 1000.0f;
 		totalTime += deltaTime;
 	}
+
+	Logger::Get()->FlushToFile();
 	return 0;
 }

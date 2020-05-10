@@ -41,14 +41,21 @@ project "Waffle2D"
 		"../Source/**.cpp",
 		"../Depen/glad/src/**.c"
 	}
+	libdirs
+	{
+		"../Depen/OpenAL/libs/Win64"
+	}
 	links
 	{
-		"OpenGL32"
+		"OpenGL32",
+		"OpenAL32"
 	}
 	includedirs
 	{
 		"../Depen/glad/include",
-		"../Depen/stb"
+		"../Depen/stb",
+		"../Depen/OpenAL/include"
+
 	}
 	filter "configurations:Debug"
 		symbols "On"
