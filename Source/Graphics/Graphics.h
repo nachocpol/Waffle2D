@@ -7,6 +7,7 @@ namespace Waffle
 	class Window;
 	class Sprite;
 	class Image;
+	class Font;
 	class Graphics
 	{
 	private:
@@ -23,6 +24,7 @@ namespace Waffle
 		void Flush();
 		void ClearScreen(float r, float g, float b, float a);
 		void DrawSprite(Sprite* sprite);
+		void DrawTextString(const char* text, Font* font, Vec2 position, Color color = Color(1.0f, 1.0f, 1.0f, 1.0f));
 		void SetView(Vec2 view);
 		Vec2 GetView()const;
 		Vec2 GetCurViewport();
@@ -30,6 +32,16 @@ namespace Waffle
 
 	private:
 		bool InitResources();
+		struct DrawCallInfo
+		{
+			Mat3 WorldTransform;
+			Vec2 Projection;
+			unsigned int ImageID;
+			float ImageScaleBias[4];
+			Color Tint;
+			bool IsFont;
+		};
+		void SubmitDrawCall(const DrawCallInfo& drawCall);
 
 		unsigned int m_SpritePipeline;
 		struct Mesh

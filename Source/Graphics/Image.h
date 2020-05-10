@@ -2,6 +2,16 @@
 
 namespace Waffle
 {
+	struct PixelFormat
+	{
+		enum T
+		{
+			SRGB,
+			SRGBA,
+			R,
+			COUNT
+		};
+	};
 	class Graphics;
 	class Image
 	{
@@ -10,6 +20,7 @@ namespace Waffle
 		Image();
 		~Image();
 		static Image* CreateFromFile(const char* path);
+		static Image* CreateFromMemory(unsigned char* data, int width, int height,PixelFormat::T format);
 		int GetWidth()const;
 		int GetHeight()const;
 

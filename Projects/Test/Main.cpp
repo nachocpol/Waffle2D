@@ -57,6 +57,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		graphics.ClearScreen(0.5f, 0.5f, 0.5f, 1.0f);
 		graphics.DrawSprite(&spriteImg2);
 		graphics.DrawSprite(&spriteImg);
+		graphics.DrawTextString("Hello Motherfucker!", hackFont, Vec2(-520.0f,400.0f), Color(1.0f,0.0f,1.0f,1.0f));
+
 		graphics.Flush();
 
 		// Update frame time:

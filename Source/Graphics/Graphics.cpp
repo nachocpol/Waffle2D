@@ -1,9 +1,10 @@
 ﻿#include "Graphics/Graphics.h"
-#include "Window.h"
-#include "FileUtils.h"
 #include "Graphics/MathUtils.h"
 #include "Graphics/Sprite.h"
 #include "Graphics/Image.h"
+#include "Graphics/Font.h"
+#include "FileUtils.h"
+#include "Window.h"
 #include "Logging.h"
 
 #include <cstdio>
@@ -12,6 +13,7 @@
 #include "glad/glad_wgl.h"
 
 #include <windows.h>
+
 
 using namespace Waffle;
 
@@ -273,39 +275,67 @@ void Graphics::DrawSprite(Sprite* sprite)
 
 	Mat3 worldTransform = transform.AsMatrix();
 
-	glBindVertexArray(m_SpriteMesh.ID);
-	glUseProgram(m_SpritePipeline);
+	DrawCallInfo dc;
+	dc.ImageID = sprite->GetImage() ? sprite->GetImage()->m_ImageID : 0;
+	Vec2 scale = sprite->GetImageScale();
+	Vec2 bias   = sprite->GetImageBias();
+	dc.ImageScaleBias[0] = scale.X;
+	dc.ImageScaleBias[1] = scale.Y;
+	dc.ImageScaleBias[2] = bias.X;
+	dc.ImageScaleBias[3] = bias.Y;
+	dc.Tint = sprite->GetTint();
+	dc.WorldTransform = worldTransform;
+	dc.Projection = projection;
+	dc.IsFont = false;
+		
+	SubmitDrawCall(dc);
+}
+
+void Graphics::DrawTextString(const char* text, Font* font, Vec2 position, Color color)
+{
+	int numChars = strlen(text);
+
+	const Image* fontImage = font->GetFontImage();
+	float fontWidth = (float)fontImage->GetWidth();
+	float fontHeight = (float)fontImage->GetHeight();
+
+	// Simple orthographic projection:
+	float w = (float)m_Width  * m_RenderScale;
+	float h = (float)m_Height * m_RenderScale;
+	Vec2 projection = Vec2(1.0f / (w * 0.5f), 1.0f / (h * 0.5f));
+
+	DrawCallInfo dc;
+	dc.ImageID = fontImage->m_ImageID;
+	dc.Projection = projection;
+	dc.IsFont = true;
+	dc.Tint = color;
+
+	Transform transform;
+	transform.Position = position;
+
+	float curX = 0.0f;
+
+	for(int charIdx = 0; charIdx < numChars;++charIdx)
 	{
-		// Transforms:
-		glUniform2fv(glGetUniformLocation(m_SpritePipeline, "uProjection"), 1, &projection.X);
-		glUniformMatrix3fv(glGetUniformLocation(m_SpritePipeline, "uTransform"), 1, GL_FALSE, worldTransform.Data[0]);
+		const CharacterData& charData = font->GetCharacterData(text[charIdx]);
 
-		// Tint:
-		Color tint = sprite->GetTint();
-		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uTint"), 1, &tint.R);
+		transform.Scale = Vec2(charData.X1 - charData.X0, charData.Y1 - charData.Y0);
 
-		// Scale and bias
-		Vec2 imgScale = sprite->GetImageScale();
-		Vec2 imgBias = sprite->GetImageBias();
-		float scaleBias[4] = { imgScale.X, imgScale.Y, imgBias.X, imgBias.Y };
-		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uScaleBias"), 1, scaleBias);
+		// Scale bias:
+		dc.ImageScaleBias[0] = (transform.Scale.X) / fontWidth;
+		dc.ImageScaleBias[1] = (transform.Scale.Y) / fontHeight;
+		dc.ImageScaleBias[2] = charData.X0 / fontWidth;
+		dc.ImageScaleBias[3] = charData.Y0 / fontHeight;
+		
+		transform.Scale.Y *= -1.0f; // Ug... flip it.
 
-		// Bind image:
-		glActiveTexture(GL_TEXTURE0);
-		const Image* img = sprite->GetImage();
-		if (img)
-		{
-			glBindTexture(GL_TEXTURE_2D, img->m_ImageID);
-		}
-		else
-		{
-			glBindTexture(GL_TEXTURE_2D, m_WhiteImage->m_ImageID);
-		}
-		glUniform1i(glGetUniformLocation(m_SpritePipeline, "uImage"), 0);
+		Mat3 worldMtx = transform.AsMatrix();
+		dc.WorldTransform = worldMtx;
+		
+		SubmitDrawCall(dc);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		transform.Position.X += charData.XAdvance;
 	}
-	glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
 }
 
 void Graphics::SetView(Vec2 view)
@@ -411,4 +441,39 @@ bool Graphics::InitResources()
 	}
 
 	return true;
+}
+
+void Graphics::SubmitDrawCall(const DrawCallInfo& drawCall)
+{
+	glBindVertexArray(m_SpriteMesh.ID);
+	glUseProgram(m_SpritePipeline);
+	{
+		// Transforms:
+		glUniform2fv(glGetUniformLocation(m_SpritePipeline, "uProjection"), 1, &drawCall.Projection.X);
+		glUniformMatrix3fv(glGetUniformLocation(m_SpritePipeline, "uTransform"), 1, GL_FALSE, drawCall.WorldTransform.Data[0]);
+
+		// Tint:
+		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uTint"), 1, &drawCall.Tint.R);
+
+		// Scale and bias
+		glUniform4fv(glGetUniformLocation(m_SpritePipeline, "uScaleBias"), 1, drawCall.ImageScaleBias);
+
+		// Font
+		glUniform1i(glGetUniformLocation(m_SpritePipeline, "uFontRender"), drawCall.IsFont ? 1 : 0);
+
+		// Bind image:
+		glActiveTexture(GL_TEXTURE0);
+		if (drawCall.ImageID != 0)
+		{
+			glBindTexture(GL_TEXTURE_2D, drawCall.ImageID);
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D, m_WhiteImage->m_ImageID);
+		}
+		glUniform1i(glGetUniformLocation(m_SpritePipeline, "uImage"), 0);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+	glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
 }
