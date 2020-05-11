@@ -3,12 +3,13 @@
 TODO:
 
 + Move log.txt to Temp
-+ OpenAl
-+ Cleanup project generation so it detecs projects
 + Fix intel rendering
-+ Text rendering
 + Renderer perf, auto batch
 + Imgui
++ Unify shaders: include system? Defines?
 
 
 DONE:
++ OpenAl
++ Cleanup project generation so it detecs projects
++ Text rendering

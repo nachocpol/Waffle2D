@@ -9,6 +9,8 @@
 
 #define clamp(n,mi,ma) fmin(ma, fmax(mi, n))
 #define saturate(n) fmin(1.0f, fmax(0.0f, n))
+#define lerp(a,b,t) ((1.0f - t) * a + t * b)
+#define quintic(a,b,t) lerp(a, b, t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f))
 
 namespace Waffle
 {

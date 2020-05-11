@@ -42,8 +42,10 @@ namespace Waffle
 			bool IsFont;
 		};
 		void SubmitDrawCall(const DrawCallInfo& drawCall);
+		unsigned int CreatePipeline(const char* vs, const char* ps);
 
 		unsigned int m_SpritePipeline;
+		unsigned int m_SpriteInstancedPipeline;
 		struct Mesh
 		{
 			unsigned int ID;

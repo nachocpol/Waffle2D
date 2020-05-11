@@ -106,6 +106,12 @@ void Sprite::SetImageScaleBias(float su, float sv, float bu, float bv)
 	m_ImageBias = Vec2(bu, bv);
 }
 
+void Sprite::SetImageScaleBias(Vec2 scale, Vec2 bias)
+{
+	m_ImageScale = scale;
+	m_ImageBias = bias;
+}
+
 Vec2 Sprite::GetImageScale() const
 {
 	return m_ImageScale;

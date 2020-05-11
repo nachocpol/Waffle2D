@@ -30,6 +30,7 @@ namespace Waffle
 		void SetImage(Image* image);
 
 		void SetImageScaleBias(float su, float sv, float bu, float bv);
+		void SetImageScaleBias(Vec2 scale, Vec2 bias);
 		Vec2 GetImageScale()const;
 		Vec2 GetImageBias()const;
 

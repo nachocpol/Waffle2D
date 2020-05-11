@@ -67,7 +67,6 @@ ConfigFile.write("\tlanguage \"C++\"\n");
 ConfigFile.write("\tlocation \"../Temp/VSFiles\"\n");
 ConfigFile.write("\ttargetdir \"../Build/%{cfg.platform}/%{cfg.buildcfg}\"\n");
 ConfigFile.write("\tfiles\n");
-
 ConfigFile.write("\t{\n");
 ConfigFile.write(("\t\t\"../Projects/{0}/**.h\",\n").format(ProjName));
 ConfigFile.write(("\t\t\"../Projects/{0}/**.cpp\"\n").format(ProjName));
@@ -76,6 +75,11 @@ ConfigFile.write("\t}\n");
 ConfigFile.write("\tlinks\n");
 ConfigFile.write("\t{\n");
 ConfigFile.write("\t\t\"Waffle2D\"\n");
+ConfigFile.write("\t}\n");
+
+ConfigFile.write("\tincludedirs\n");
+ConfigFile.write("\t{\n");
+ConfigFile.write("\t\t\"../Projects/{0}/Source/\"\n".format(ProjName));
 ConfigFile.write("\t}\n");
 
 ConfigFile.write("\tfilter \"configurations:Debug\"\n");

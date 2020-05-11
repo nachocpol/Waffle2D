@@ -292,7 +292,7 @@ void Graphics::DrawSprite(Sprite* sprite)
 
 void Graphics::DrawTextString(const char* text, Font* font, Vec2 position, Color color)
 {
-	int numChars = strlen(text);
+	int numChars = (int)strlen(text);
 
 	const Image* fontImage = font->GetFontImage();
 	float fontWidth = (float)fontImage->GetWidth();
@@ -359,38 +359,15 @@ void Graphics::SetRenderScale(float scale)
 
 bool Graphics::InitResources()
 {
-	// Setup shaders:
-	m_SpritePipeline = glCreateProgram();
-	unsigned int spriteVtxShader = 0;
-	if (!CreateShader("shaders:Sprite.vert", GL_VERTEX_SHADER, spriteVtxShader))
-	{
-		return false;
-	}
-	unsigned int spriteFragShader = 0;
-	if (!CreateShader("shaders:Sprite.frag", GL_FRAGMENT_SHADER, spriteFragShader))
+	// Setup pipelines:
+	m_SpritePipeline = CreatePipeline("shaders:Sprite.vert", "shaders:Sprite.frag");
+	if (!m_SpritePipeline)
 	{
 		return false;
 	}
 
-	glAttachShader(m_SpritePipeline, spriteVtxShader);
-	glAttachShader(m_SpritePipeline, spriteFragShader);
-
-	glBindAttribLocation(m_SpritePipeline, 0, "aPosition");
-	glBindAttribLocation(m_SpritePipeline, 1, "aTexCoord");
-
-	glLinkProgram(m_SpritePipeline);
-	int res = 0;
-	glGetProgramiv(m_SpritePipeline, GL_LINK_STATUS, &res);
-	if (!res)
-	{
-		char info[512];
-		glGetProgramInfoLog(m_SpritePipeline, 512, nullptr, info);
-		ERR("Failed to link the program! \n %s", info);
-	}
-	glDeleteShader(spriteFragShader);
-	glDeleteShader(spriteVtxShader);
-
-	if (!res)
+	m_SpriteInstancedPipeline = CreatePipeline("shaders:SpriteInstanced.vert", "shaders:SpriteInstanced.frag");
+	if (!m_SpriteInstancedPipeline)
 	{
 		return false;
 	}
@@ -475,4 +452,45 @@ void Graphics::SubmitDrawCall(const DrawCallInfo& drawCall)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 	glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
+}
+
+unsigned int Graphics::CreatePipeline(const char* vs, const char* ps)
+{
+	unsigned int pipeline = glCreateProgram();
+
+	unsigned int vertexShader = 0;
+	if (!CreateShader(vs, GL_VERTEX_SHADER, vertexShader))
+	{
+		return 0;
+	}
+	unsigned int pixelShader = 0;
+	if (!CreateShader(ps, GL_FRAGMENT_SHADER, pixelShader))
+	{
+		return 0;
+	}
+
+	glAttachShader(pipeline, vertexShader);
+	glAttachShader(pipeline, pixelShader);
+
+	glBindAttribLocation(pipeline, 0, "aPosition");
+	glBindAttribLocation(pipeline, 1, "aTexCoord");
+
+	glLinkProgram(pipeline);
+	int res = 0;
+	glGetProgramiv(pipeline, GL_LINK_STATUS, &res);
+	if (!res)
+	{
+		char info[512];
+		glGetProgramInfoLog(pipeline, 512, nullptr, info);
+		ERR("Failed to link the program! \n %s", info);
+	}
+	glDeleteShader(pixelShader);
+	glDeleteShader(vertexShader);
+
+	if (!res)
+	{
+		return 0;
+	}
+
+	return pipeline;
 }
