@@ -43,3 +43,8 @@ int Input::GetMouseY()
 {
 	return Get().m_State.MouseY;
 }
+
+int Input::GetMouseWheelDelta()
+{
+	return Get().m_State.MouseWheelDelta;
+}

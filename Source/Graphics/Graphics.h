@@ -2,17 +2,21 @@
 
 #include "Graphics/MathUtils.h"
 
+#include <vector>
+
 namespace Waffle
 {
 	class Window;
 	class Sprite;
 	class Image;
 	class Font;
+	struct BatchManager;
 	class Graphics
 	{
+		friend BatchManager;
 	private:
 		Graphics();
-		Graphics(const Graphics& other) {};
+		Graphics(const Graphics& other);
 		~Graphics();
 
 	public:
@@ -29,6 +33,7 @@ namespace Waffle
 		Vec2 GetView()const;
 		Vec2 GetCurViewport();
 		void SetRenderScale(float scale);
+		float GetRenderScale()const;
 
 	private:
 		bool InitResources();
@@ -51,6 +56,30 @@ namespace Waffle
 			unsigned int ID;
 			unsigned int VertexBufferID;
 		}m_SpriteMesh;
+
+		struct BatchManager
+		{
+			BatchManager(Graphics* graphics);
+			void Push(const DrawCallInfo& dc);
+			void Flush();
+			void SwapBuffer();
+			bool Enabled = true;
+			int DrawsPerBatch = 4096;
+			int MaxBatches = 128;
+			std::vector<DrawCallInfo> Batch;
+		private:
+			struct PerBatchData
+			{
+				float ScaleBias[4];
+				float Tint[4];
+				float Transform[4][4]; // Make this a mat4 to avoid vec3 weirdness
+			};
+			int m_ItemCount;	// Item count inside each batch
+			int m_BatchIndex;	// Current batch index
+			int m_BufferIndex;
+			unsigned int* m_BatchBuffers[2];
+			Graphics* m_Graphics;
+		}m_BatchManager;
 
 		bool m_Initialized;
 		Window* m_Window;

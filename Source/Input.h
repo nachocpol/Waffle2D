@@ -43,6 +43,7 @@ namespace Waffle
 		static bool GetMouseButton(int idx);
 		static int GetMouseX();
 		static int GetMouseY();
+		static int GetMouseWheelDelta();
 
 		void SetState(InputState state);
 

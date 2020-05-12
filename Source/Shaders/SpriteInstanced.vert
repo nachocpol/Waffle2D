@@ -12,7 +12,7 @@ struct InstanceData
 {
     vec4 ScaleBias;
     vec4 Tint;
-    mat3 Transform;
+    mat4 Transform;
 };
 layout(std430, binding = 0) buffer InstanceBuffer 
 { 
@@ -28,7 +28,7 @@ void main()
     
     vInstanceID = gl_InstanceID;    
     vTexCoord = TexCoord;
-    vec2 worldPos = (vec3(Position, 1.0) * uPerInstance[gl_InstanceID].Transform ).xy;
+    vec2 worldPos = (vec3(Position, 1.0) * mat3(uPerInstance[gl_InstanceID].Transform)).xy;
 
     gl_Position = vec4(worldPos * uProjection, 1.0 ,1.0);
 }

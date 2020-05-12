@@ -1,10 +1,9 @@
 
 
 TODO:
-
++ Batch, only memcpy once (this should improve debug perf)
 + Move log.txt to Temp
 + Fix intel rendering
-+ Renderer perf, auto batch
 + Imgui
 + Unify shaders: include system? Defines?
 
@@ -13,3 +12,4 @@ DONE:
 + OpenAl
 + Cleanup project generation so it detecs projects
 + Text rendering
++ Renderer perf, auto batch

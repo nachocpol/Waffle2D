@@ -1,2 +1,2 @@
-"Scripts/ProjectGenerator.py" Test
+"Scripts/ProjectGenerator.py" PirateLife
 pause

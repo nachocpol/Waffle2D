@@ -6,6 +6,7 @@
 #include "FileUtils.h"
 #include "Window.h"
 #include "Logging.h"
+#include "Time.h"
 
 #include <cstdio>
 
@@ -18,6 +19,10 @@ using namespace Waffle;
 
 void GLAPIENTRY GLDebugCallback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam)
 {
+	if (type == GL_DEBUG_TYPE_OTHER)
+	{
+		return;
+	}
 	if (type == GL_DEBUG_TYPE_ERROR)
 	{
 		ERR("GL CALLBACK: message = %s", message);
@@ -72,6 +77,12 @@ Graphics::Graphics()
 	, m_WhiteImage(nullptr)
 	, m_View(0.0f, 0.0f)
 	, m_RenderScale(1.0f)
+	, m_BatchManager(this)
+{
+}
+
+Waffle::Graphics::Graphics(const Graphics& other)
+	: m_BatchManager(nullptr)
 {
 }
 
@@ -230,6 +241,9 @@ void Waffle::Graphics::BeginFrame()
 
 void Graphics::Flush()
 {
+	m_BatchManager.Flush();
+	m_BatchManager.SwapBuffer();
+
 	HDC deviceHandle = GetDC((HWND)m_Window->GetHandle());
 	SwapBuffers(deviceHandle);
 }
@@ -287,7 +301,7 @@ void Graphics::DrawSprite(Sprite* sprite)
 	dc.Projection = projection;
 	dc.IsFont = false;
 		
-	SubmitDrawCall(dc);
+	m_BatchManager.Push(dc);
 }
 
 void Graphics::DrawTextString(const char* text, Font* font, Vec2 position, Color color)
@@ -355,6 +369,11 @@ Vec2 Graphics::GetCurViewport()
 void Graphics::SetRenderScale(float scale)
 {
 	m_RenderScale = scale;
+}
+
+float Graphics::GetRenderScale() const
+{
+	return m_RenderScale;
 }
 
 bool Graphics::InitResources()
@@ -493,4 +512,160 @@ unsigned int Graphics::CreatePipeline(const char* vs, const char* ps)
 	}
 
 	return pipeline;
+}
+
+Graphics::BatchManager::BatchManager(Graphics* graphics)
+	: m_Graphics(graphics)
+	, m_BatchIndex(0)
+	, m_ItemCount(0)
+	, m_BufferIndex(0)
+{
+	Batch.resize(DrawsPerBatch);
+	m_BatchBuffers[0] = nullptr;
+	m_BatchBuffers[1] = nullptr;
+}
+
+void Graphics::BatchManager::Push(const DrawCallInfo& dc)
+{
+	// Check if we reached max number of batches:
+	if (m_BatchIndex >= (MaxBatches - 1))
+	{
+		ERR("Ran out of  batches for this frame");
+		m_Graphics->SubmitDrawCall(dc);
+		return;
+	}
+
+	// Pass through:
+	if (!Enabled)
+	{
+		m_Graphics->SubmitDrawCall(dc);
+		return;
+	}
+
+	// Check if we need to flush:
+	if (m_ItemCount != 0)
+	{
+		const DrawCallInfo& ref = Batch[0];
+		if (!((dc.ImageID == ref.ImageID) && (dc.IsFont == ref.IsFont) && (dc.Projection == ref.Projection)))
+		{
+			Flush();
+		}
+	}
+
+	Batch[m_ItemCount++] = dc;
+	if (m_ItemCount >= DrawsPerBatch)
+	{
+		// Also flush if reached max draws for the batch:
+		Flush();
+	}
+}
+
+void Graphics::BatchManager::Flush()
+{
+	// Nothing to do...
+	if (m_ItemCount <= 0)
+	{
+		return;
+	}
+
+	if (!m_BatchBuffers[0])
+	{
+		Timer setupBatch;
+		setupBatch.Start();
+
+		m_BatchBuffers[0] = new unsigned int[MaxBatches];
+		m_BatchBuffers[1] = new unsigned int[MaxBatches];
+
+		glGenBuffers(MaxBatches, m_BatchBuffers[0]);
+		glGenBuffers(MaxBatches, m_BatchBuffers[1]);
+
+		for (int idx = 0; idx < 2; ++idx)
+		{
+			for (int b = 0; b < MaxBatches; ++b)
+			{
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BatchBuffers[idx][b]);
+				glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PerBatchData) * DrawsPerBatch, NULL, GL_DYNAMIC_DRAW);
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+			}
+		}
+
+		INFO("Creating all the batch resources took:%fms", setupBatch.Stop());
+		size_t totalMem = 2 * MaxBatches * DrawsPerBatch * sizeof(PerBatchData);
+		INFO("Total GPU mem for batch buffers:%i", totalMem);
+	}
+
+	// Copy data into batch GPU buffer:
+	// NOTE: not sure wtf is OpenGL doing, the 1st map of the frame takes 13ms? Is that like doing one sync every frame, and thats it?
+	// as it stands, should be doing any wait sync.
+	// https://www.gamedev.net/forums/topic/666461-map-buffer-range-super-slow/
+	// https://www.khronos.org/opengl/wiki/GLAPI/glMapBufferRange
+	// https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming
+	Timer flushTimer;
+	flushTimer.Start();
+	unsigned int bidx = m_BatchBuffers[m_BufferIndex][m_BatchIndex];
+	//INFO("Using buffer: %i", bidx);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, bidx);
+	PerBatchData* pData = (PerBatchData*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(PerBatchData) * m_ItemCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+	//INFO("Flush took:%f", flushTimer.Stop());
+
+	Timer copyTimer;
+	copyTimer.Start();
+	for (int i = 0; i < m_ItemCount; ++i)
+	{
+		memcpy(pData->ScaleBias, Batch[i].ImageScaleBias, sizeof(float) * 4);
+
+		memcpy(pData->Tint, &Batch[i].Tint.R, sizeof(float) * 4);
+
+		memcpy(pData->Transform[0], &Batch[i].WorldTransform.Row0.X, sizeof(float) * 3);
+		memcpy(pData->Transform[1], &Batch[i].WorldTransform.Row1.X, sizeof(float) * 3);
+		memcpy(pData->Transform[2], &Batch[i].WorldTransform.Row2.X, sizeof(float) * 3);
+		
+		++pData;
+	}
+   	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	//INFO("Copy batch took:%f", copyTimer.Stop());
+
+	// Submit draw call:
+	{
+		Vec2 projection = Batch[0].Projection;
+		int font = Batch[0].IsFont ? 1 : 0;
+		int imgID = Batch[0].ImageID;
+
+		glBindVertexArray(m_Graphics->m_SpriteMesh.ID);
+		glUseProgram(m_Graphics->m_SpriteInstancedPipeline);
+		{
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_BatchBuffers[m_BufferIndex][m_BatchIndex]);
+
+			// Transforms:
+			glUniform2fv(glGetUniformLocation(m_Graphics->m_SpriteInstancedPipeline, "uProjection"), 1, &projection.X);
+
+			// Font
+			glUniform1i(glGetUniformLocation(m_Graphics->m_SpriteInstancedPipeline, "uFontRender"), font);
+
+			// Bind image:
+			glActiveTexture(GL_TEXTURE0);
+			if (imgID != 0)
+			{
+				glBindTexture(GL_TEXTURE_2D, imgID);
+			}
+			else
+			{
+				glBindTexture(GL_TEXTURE_2D, m_Graphics->m_WhiteImage->m_ImageID);
+			}
+			glUniform1i(glGetUniformLocation(m_Graphics->m_SpriteInstancedPipeline, "uImage"), 0);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_ItemCount);
+		}
+		glBindVertexArray(kDummyVAO); // Unbind sprite VAO to avoid messing it.
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // Unbind batch SSBO
+	}
+
+	m_ItemCount = 0;
+	m_BatchIndex++; // Increase batch index
+}
+
+void Graphics::BatchManager::SwapBuffer()
+{
+	m_BufferIndex = !m_BufferIndex;
+	m_BatchIndex = 0;
 }

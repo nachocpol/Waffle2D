@@ -45,6 +45,11 @@ namespace Waffle
 		{
 			return Vec2(this->X * other, this->Y * other);
 		}
+
+		bool operator == (const Vec2& other)const
+		{
+			return (this->X == other.X) && (this->Y == other.Y);
+		}
 	};
 
 	struct Vec3
