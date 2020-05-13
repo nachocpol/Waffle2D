@@ -14,6 +14,15 @@
 
 namespace Waffle
 {
+	struct IVec2
+	{
+		union 
+		{
+			int Data[2];
+			struct { int X; int Y; };
+		};
+	};
+
 	struct Vec2
 	{
 		Vec2() 

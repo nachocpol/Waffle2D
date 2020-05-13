@@ -10,9 +10,9 @@ uniform vec2 uProjection;
 
 struct InstanceData
 {
+    mat4 Transform;
     vec4 ScaleBias;
     vec4 Tint;
-    mat4 Transform;
 };
 layout(std430, binding = 0) buffer InstanceBuffer 
 { 

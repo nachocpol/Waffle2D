@@ -66,19 +66,20 @@ namespace Waffle
 			bool Enabled = true;
 			int DrawsPerBatch = 4096;
 			int MaxBatches = 128;
-			std::vector<DrawCallInfo> Batch;
 		private:
 			struct PerBatchData
 			{
+				float Transform[4][4]; // Make this a mat4 to avoid vec3 weirdness
 				float ScaleBias[4];
 				float Tint[4];
-				float Transform[4][4]; // Make this a mat4 to avoid vec3 weirdness
 			};
 			int m_ItemCount;	// Item count inside each batch
 			int m_BatchIndex;	// Current batch index
 			int m_BufferIndex;
 			unsigned int* m_BatchBuffers[2];
 			Graphics* m_Graphics;
+			std::vector<PerBatchData> m_Batch;
+			DrawCallInfo m_CurItem;
 		}m_BatchManager;
 
 		bool m_Initialized;

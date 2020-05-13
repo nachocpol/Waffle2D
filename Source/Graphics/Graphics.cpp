@@ -520,7 +520,7 @@ Graphics::BatchManager::BatchManager(Graphics* graphics)
 	, m_ItemCount(0)
 	, m_BufferIndex(0)
 {
-	Batch.resize(DrawsPerBatch);
+	m_Batch.resize(DrawsPerBatch);
 	m_BatchBuffers[0] = nullptr;
 	m_BatchBuffers[1] = nullptr;
 }
@@ -543,16 +543,30 @@ void Graphics::BatchManager::Push(const DrawCallInfo& dc)
 	}
 
 	// Check if we need to flush:
+	bool flushed = false;
 	if (m_ItemCount != 0)
 	{
-		const DrawCallInfo& ref = Batch[0];
-		if (!((dc.ImageID == ref.ImageID) && (dc.IsFont == ref.IsFont) && (dc.Projection == ref.Projection)))
+		if (!((dc.ImageID == m_CurItem.ImageID) && (dc.IsFont == m_CurItem.IsFont) && (dc.Projection == m_CurItem.Projection)))
 		{
+			flushed = true;
 			Flush();
 		}
 	}
+	
+	// Cache current item:
+	if(flushed || m_ItemCount == 0)
+	{
+		m_CurItem = dc;
+	}
 
-	Batch[m_ItemCount++] = dc;
+	// Batch it:
+	memcpy(m_Batch[m_ItemCount].Transform[0], &dc.WorldTransform.Row0.X, sizeof(float) * 3);
+	memcpy(m_Batch[m_ItemCount].Transform[1], &dc.WorldTransform.Row1.X, sizeof(float) * 3);
+	memcpy(m_Batch[m_ItemCount].Transform[2], &dc.WorldTransform.Row2.X, sizeof(float) * 3);
+	memcpy(m_Batch[m_ItemCount].ScaleBias, dc.ImageScaleBias, sizeof(float) * 4);
+	memcpy(m_Batch[m_ItemCount].Tint, &dc.Tint.R, sizeof(float) * 4);
+	++m_ItemCount;
+	
 	if (m_ItemCount >= DrawsPerBatch)
 	{
 		// Also flush if reached max draws for the batch:
@@ -600,36 +614,21 @@ void Graphics::BatchManager::Flush()
 	// https://www.gamedev.net/forums/topic/666461-map-buffer-range-super-slow/
 	// https://www.khronos.org/opengl/wiki/GLAPI/glMapBufferRange
 	// https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming
-	Timer flushTimer;
-	flushTimer.Start();
-	unsigned int bidx = m_BatchBuffers[m_BufferIndex][m_BatchIndex];
-	//INFO("Using buffer: %i", bidx);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, bidx);
-	PerBatchData* pData = (PerBatchData*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(PerBatchData) * m_ItemCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
-	//INFO("Flush took:%f", flushTimer.Stop());
-
-	Timer copyTimer;
-	copyTimer.Start();
-	for (int i = 0; i < m_ItemCount; ++i)
+	//Timer flushTimer;
+	//flushTimer.Start();
 	{
-		memcpy(pData->ScaleBias, Batch[i].ImageScaleBias, sizeof(float) * 4);
-
-		memcpy(pData->Tint, &Batch[i].Tint.R, sizeof(float) * 4);
-
-		memcpy(pData->Transform[0], &Batch[i].WorldTransform.Row0.X, sizeof(float) * 3);
-		memcpy(pData->Transform[1], &Batch[i].WorldTransform.Row1.X, sizeof(float) * 3);
-		memcpy(pData->Transform[2], &Batch[i].WorldTransform.Row2.X, sizeof(float) * 3);
-		
-		++pData;
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_BatchBuffers[m_BufferIndex][m_BatchIndex]);
+		PerBatchData* pData = (PerBatchData*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(PerBatchData) * m_ItemCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		memcpy(pData, m_Batch.data(), sizeof(PerBatchData) * m_ItemCount);
+   		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	}
-   	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-	//INFO("Copy batch took:%f", copyTimer.Stop());
+	//INFO("Flush took:%f", flushTimer.Stop());
 
 	// Submit draw call:
 	{
-		Vec2 projection = Batch[0].Projection;
-		int font = Batch[0].IsFont ? 1 : 0;
-		int imgID = Batch[0].ImageID;
+		Vec2 projection = m_CurItem.Projection;
+		int font = m_CurItem.IsFont ? 1 : 0;
+		int imgID = m_CurItem.ImageID;
 
 		glBindVertexArray(m_Graphics->m_SpriteMesh.ID);
 		glUseProgram(m_Graphics->m_SpriteInstancedPipeline);
@@ -662,6 +661,7 @@ void Graphics::BatchManager::Flush()
 
 	m_ItemCount = 0;
 	m_BatchIndex++; // Increase batch index
+	m_CurItem = {}; // Reset item
 }
 
 void Graphics::BatchManager::SwapBuffer()
