@@ -59,6 +59,11 @@ namespace Waffle
 		{
 			return (this->X == other.X) && (this->Y == other.Y);
 		}
+
+		bool operator != (const Vec2& other)const
+		{
+			return (this->X != other.X) || (this->Y != other.Y);
+		}
 	};
 
 	struct Vec3
@@ -163,6 +168,8 @@ namespace Waffle
 		float G;
 		float B;
 		float A;
+
+		static const Color& Black() { return Color(0.0f, 0.0f, 0.0f, 1.0f); };
 	};
 
 	struct Transform

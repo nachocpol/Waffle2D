@@ -313,8 +313,8 @@ void Graphics::DrawTextString(const char* text, Font* font, Vec2 position, Color
 	float fontHeight = (float)fontImage->GetHeight();
 
 	// Simple orthographic projection:
-	float w = (float)m_Width  * m_RenderScale;
-	float h = (float)m_Height * m_RenderScale;
+	float w = (float)m_Width;// *m_RenderScale;
+	float h = (float)m_Height;// *m_RenderScale;
 	Vec2 projection = Vec2(1.0f / (w * 0.5f), 1.0f / (h * 0.5f));
 
 	DrawCallInfo dc;

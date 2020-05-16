@@ -20,6 +20,10 @@ Font::~Font()
 
 const CharacterData& Font::GetCharacterData(char c)
 {
+	if (c < 32)
+	{
+		return CharacterData{};
+	}
 	// TO-DO: I mean.. cmon.
 	return m_Characters[c - 32];
 }
